@@ -1,0 +1,209 @@
+AUG:
+  CONTRAST: 0.4
+  CROP_PER: 0.4
+  CROP_SIZE: 512
+  HUE: 0.2
+  INTENSITY: 0.4
+  IS_AUG: true
+  RESIZE_RATIO: 0.3
+  SATURATION: 0.4
+BASE:
+- ''
+CFG_DIR: ./Configs
+CFG_NOTE: GIDwater
+DATA:
+  BATCH_SIZE: 4
+  CLASS_LIST:
+  - 0
+  - 255
+  INTERPOLATION: bilinear
+  MASK_PATCH_SIZE: 32
+  MASK_RATIO: 0.6
+  NUM_CLASSES: 2
+  NUM_WORKERS: 4
+  PIN_MEMORY: true
+  TRAIN_DATA_PATH: F:\RSDL\GID\train
+  VALID_DATA_PATH: F:\RSDL\GID\valid
+DEVICE_IDX: 0
+IS_EVAL: false
+IS_SAVE_PRED: false
+LOG_DIR: ./Logs
+NET:
+  DROP_PATH_RATE: 0.1
+  DROP_RATE: 0.0
+  NAME: swinv2unet
+  PRETRAIN_PATH: null
+  SIMMIM:
+    NORM_TARGET:
+      ENABLE: false
+      PATCH_SIZE: 47
+  SWIN:
+    APE: false
+    DEPTHS:
+    - 2
+    - 2
+    - 6
+    - 2
+    EMBED_DIM: 96
+    IN_CHANS: 3
+    MLP_RATIO: 4.0
+    NUM_HEADS:
+    - 3
+    - 6
+    - 12
+    - 24
+    PATCH_NORM: true
+    PATCH_SIZE: 4
+    QKV_BIAS: true
+    QK_SCALE: null
+    WINDOW_SIZE: 7
+  SWINV2:
+    APE: false
+    DEPTHS:
+    - 2
+    - 2
+    - 6
+    - 2
+    EMBED_DIM: 96
+    IN_CHANS: 3
+    MLP_RATIO: 4.0
+    NUM_HEADS:
+    - 3
+    - 6
+    - 12
+    - 24
+    PATCH_NORM: true
+    PATCH_SIZE: 4
+    PRETRAINED_WINDOW_SIZES:
+    - 0
+    - 0
+    - 0
+    - 0
+    QKV_BIAS: true
+    WINDOW_SIZE: 7
+  SWINV2UNET:
+    APE: false
+    DEPTHS:
+    - 2
+    - 2
+    - 6
+    - 2
+    EMBED_DIM: 192
+    IN_CHANS: 3
+    MLP_RATIO: 4.0
+    NUM_HEADS:
+    - 3
+    - 6
+    - 12
+    - 24
+    PATCH_NORM: true
+    PATCH_SIZE: 8
+    PRETRAINED_WINDOW_SIZES:
+    - 0
+    - 0
+    - 0
+    - 0
+    QKV_BIAS: true
+    WINDOW_SIZE: 14
+  SWIN_MLP:
+    APE: false
+    DEPTHS:
+    - 2
+    - 2
+    - 6
+    - 2
+    EMBED_DIM: 96
+    IN_CHANS: 3
+    MLP_RATIO: 4.0
+    NUM_HEADS:
+    - 3
+    - 6
+    - 12
+    - 24
+    PATCH_NORM: true
+    PATCH_SIZE: 4
+    WINDOW_SIZE: 7
+  SWIN_MOE:
+    APE: false
+    AUX_LOSS_WEIGHT: 0.01
+    CAPACITY_FACTOR: 1.25
+    COSINE_ROUTER: false
+    COSINE_ROUTER_DIM: 256
+    COSINE_ROUTER_INIT_T: 0.5
+    DEPTHS:
+    - 2
+    - 2
+    - 6
+    - 2
+    EMBED_DIM: 96
+    GATE_NOISE: 1.0
+    INIT_STD: 0.02
+    IN_CHANS: 3
+    IS_GSHARD_LOSS: false
+    MLP_FC2_BIAS: true
+    MLP_RATIO: 4.0
+    MOE_BLOCKS:
+    - - -1
+    - - -1
+    - - -1
+    - - -1
+    MOE_DROP: 0.0
+    NORMALIZE_GATE: false
+    NUM_HEADS:
+    - 3
+    - 6
+    - 12
+    - 24
+    NUM_LOCAL_EXPERTS: 1
+    PATCH_NORM: true
+    PATCH_SIZE: 4
+    PRETRAINED_WINDOW_SIZES:
+    - 0
+    - 0
+    - 0
+    - 0
+    QKV_BIAS: true
+    QK_SCALE: null
+    TOP_VALUE: 1
+    USE_BPR: true
+    WINDOW_SIZE: 7
+  TYPE: swin
+OUTPUT: ./Configs\swinv2unet
+TEST:
+  SHUFFLE: false
+TRAIN:
+  LAYER_DECAY: 1.0
+  LEARNING_RATE: 0.002
+  LOSS:
+    A: 0.8
+    ALPHA: 0.25
+    B: 0.2
+    GAMMA: 2.0
+    IGNORE_INDEX: -100
+    IS_AVERAGE: true
+    NAME: focal
+  LR_SCHEDULER:
+    DECAY_EPOCHS: 3
+    DECAY_RATE: 0.6
+    ETA_MIN: 2.0e-05
+    GAMMA: 0.1
+    MULTISTEPS:
+    - 10
+    - 30
+    - 70
+    NAME: cosinewarm
+    T_MAX: 10
+    T_MULT: 2
+  MOE:
+    SAVE_MASTER: false
+  NUM_EPOCHS: 100
+  OPTIMIZER:
+    BETAS:
+    - 0.9
+    - 0.999
+    EPS: 2.0e-05
+    MOMENTUM: 0.9
+    NAME: adamw
+    WEIGHT_DECAY: 0.0005
+  START_EPOCH: 0
+  USE_CHECKPOINT: true

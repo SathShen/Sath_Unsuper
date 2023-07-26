@@ -1,0 +1,36 @@
+Start on cuda:0!
+22048 examples in training set and 9450 examples in validation set
+epoch: 0, epoch_time: 28m4s, train_loss: 0.019, best_loss: 0.019, lr: 0.002, train_mIoU: 0.596, best_train_mIoU: 0.596, valid_mIoU: 0.621, best_valid_mIoU: 0.621
+epoch: 1, epoch_time: 28m10s, train_loss: 0.015, best_loss: 0.015, lr: 0.002, train_mIoU: 0.724, best_train_mIoU: 0.724, valid_mIoU: 0.619, best_valid_mIoU: 0.621
+epoch: 2, epoch_time: 27m56s, train_loss: 0.013, best_loss: 0.013, lr: 0.002, train_mIoU: 0.781, best_train_mIoU: 0.781, valid_mIoU: 0.765, best_valid_mIoU: 0.765
+epoch: 3, epoch_time: 27m50s, train_loss: 0.013, best_loss: 0.013, lr: 0.002, train_mIoU: 0.796, best_train_mIoU: 0.796, valid_mIoU: 0.650, best_valid_mIoU: 0.765
+epoch: 4, epoch_time: 28m16s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.811, best_train_mIoU: 0.811, valid_mIoU: 0.709, best_valid_mIoU: 0.765
+epoch: 5, epoch_time: 27m59s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.805, best_train_mIoU: 0.811, valid_mIoU: 0.775, best_valid_mIoU: 0.775
+epoch: 6, epoch_time: 28m11s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.808, best_train_mIoU: 0.811, valid_mIoU: 0.764, best_valid_mIoU: 0.775
+epoch: 7, epoch_time: 27m51s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.810, best_train_mIoU: 0.811, valid_mIoU: 0.792, best_valid_mIoU: 0.792
+epoch: 8, epoch_time: 27m51s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.812, best_train_mIoU: 0.812, valid_mIoU: 0.799, best_valid_mIoU: 0.799
+epoch: 9, epoch_time: 27m53s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.815, best_train_mIoU: 0.815, valid_mIoU: 0.744, best_valid_mIoU: 0.799
+epoch: 10, epoch_time: 27m56s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.809, best_train_mIoU: 0.815, valid_mIoU: 0.690, best_valid_mIoU: 0.799
+epoch: 11, epoch_time: 28m7s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.813, best_train_mIoU: 0.815, valid_mIoU: 0.789, best_valid_mIoU: 0.799
+epoch: 12, epoch_time: 28m10s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.813, best_train_mIoU: 0.815, valid_mIoU: 0.691, best_valid_mIoU: 0.799
+epoch: 13, epoch_time: 27m54s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.816, best_train_mIoU: 0.816, valid_mIoU: 0.792, best_valid_mIoU: 0.799
+epoch: 14, epoch_time: 27m46s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.814, best_train_mIoU: 0.816, valid_mIoU: 0.772, best_valid_mIoU: 0.799
+epoch: 15, epoch_time: 27m51s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.818, best_train_mIoU: 0.818, valid_mIoU: 0.785, best_valid_mIoU: 0.799
+epoch: 16, epoch_time: 28m3s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.819, best_train_mIoU: 0.819, valid_mIoU: 0.786, best_valid_mIoU: 0.799
+epoch: 17, epoch_time: 27m55s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.823, best_train_mIoU: 0.823, valid_mIoU: 0.704, best_valid_mIoU: 0.799
+epoch: 18, epoch_time: 27m55s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.825, best_train_mIoU: 0.825, valid_mIoU: 0.784, best_valid_mIoU: 0.799
+epoch: 19, epoch_time: 27m56s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.820, best_train_mIoU: 0.825, valid_mIoU: 0.768, best_valid_mIoU: 0.799
+epoch: 20, epoch_time: 28m6s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.781, best_valid_mIoU: 0.799
+epoch: 21, epoch_time: 28m2s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.822, best_train_mIoU: 0.825, valid_mIoU: 0.799, best_valid_mIoU: 0.799
+epoch: 22, epoch_time: 28m2s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.758, best_valid_mIoU: 0.799
+epoch: 23, epoch_time: 28m4s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.817, best_train_mIoU: 0.825, valid_mIoU: 0.719, best_valid_mIoU: 0.799
+epoch: 24, epoch_time: 27m14s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.819, best_train_mIoU: 0.825, valid_mIoU: 0.753, best_valid_mIoU: 0.799
+epoch: 25, epoch_time: 26m44s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.819, best_train_mIoU: 0.825, valid_mIoU: 0.763, best_valid_mIoU: 0.799
+epoch: 26, epoch_time: 27m20s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.822, best_train_mIoU: 0.825, valid_mIoU: 0.764, best_valid_mIoU: 0.799
+epoch: 27, epoch_time: 28m0s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.820, best_train_mIoU: 0.825, valid_mIoU: 0.782, best_valid_mIoU: 0.799
+epoch: 28, epoch_time: 28m9s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.820, best_train_mIoU: 0.825, valid_mIoU: 0.787, best_valid_mIoU: 0.799
+epoch: 29, epoch_time: 28m7s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.760, best_valid_mIoU: 0.799
+epoch: 30, epoch_time: 27m41s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.768, best_valid_mIoU: 0.799
+epoch: 31, epoch_time: 27m33s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.769, best_valid_mIoU: 0.799
+epoch: 32, epoch_time: 27m23s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.821, best_train_mIoU: 0.825, valid_mIoU: 0.764, best_valid_mIoU: 0.799
+epoch: 33, epoch_time: 27m26s, train_loss: 0.012, best_loss: 0.012, lr: 0.002, train_mIoU: 0.818, best_train_mIoU: 0.825, valid_mIoU: 0.675, best_valid_mIoU: 0.799

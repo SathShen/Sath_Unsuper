@@ -1,0 +1,6 @@
+Evaluate on cuda:0!, save predict: True
+9450 examples in test set.
+evaluate_time: 12m34s, 12.54examples/sec
+===>PA: 0.952
+===>mPrecision: 0.810	mRecall: 0.700
+===>mIoU: 0.646		mF1-score: 0.741

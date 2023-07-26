@@ -1,0 +1,14 @@
+Start on cuda:0!
+8 examples in training set and 2 examples in validation set
+epoch: 0, epoch_time: 29s, train_loss: 0.598, best_loss: 0.598, lr: 2.00e-03, train_mIoU: 0.452, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 1, epoch_time: 23s, train_loss: 0.358, best_loss: 0.358, lr: 1.95e-03, train_mIoU: 0.434, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 2, epoch_time: 24s, train_loss: 0.285, best_loss: 0.285, lr: 1.81e-03, train_mIoU: 0.431, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 3, epoch_time: 23s, train_loss: 0.253, best_loss: 0.253, lr: 1.59e-03, train_mIoU: 0.425, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 4, epoch_time: 23s, train_loss: 0.185, best_loss: 0.185, lr: 1.32e-03, train_mIoU: 0.439, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 5, epoch_time: 23s, train_loss: 0.191, best_loss: 0.185, lr: 1.01e-03, train_mIoU: 0.424, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 6, epoch_time: 23s, train_loss: 0.202, best_loss: 0.185, lr: 7.04e-04, train_mIoU: 0.426, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 7, epoch_time: 24s, train_loss: 0.192, best_loss: 0.185, lr: 4.28e-04, train_mIoU: 0.423, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 8, epoch_time: 23s, train_loss: 0.184, best_loss: 0.184, lr: 2.09e-04, train_mIoU: 0.431, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 9, epoch_time: 23s, train_loss: 0.194, best_loss: 0.184, lr: 6.85e-05, train_mIoU: 0.427, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 10, epoch_time: 24s, train_loss: 0.241, best_loss: 0.184, lr: 2.00e-03, train_mIoU: 0.431, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473
+epoch: 11, epoch_time: 23s, train_loss: 0.183, best_loss: 0.183, lr: 1.99e-03, train_mIoU: 0.430, best_train_mIoU: 0.452, valid_mIoU: 0.473, best_valid_mIoU: 0.473

@@ -1,0 +1,5 @@
+Start on cuda:0!
+12 examples in training set and 4 examples in validation set
+epoch: 0, epoch_time: 30, train_loss: 0.461, best_loss: 0.461, lr: 0.002, train_mIoU: 0.036, best_train_mIoU: 0.036, valid_mIoU: nan, best_valid_mIoU: nan
+epoch: 1, epoch_time: 27, train_loss: 0.440, best_loss: 0.440, lr: 0.002, train_mIoU: nan, best_train_mIoU: 0.036, valid_mIoU: nan, best_valid_mIoU: nan
+epoch: 2, epoch_time: 26, train_loss: 0.430, best_loss: 0.430, lr: 0.002, train_mIoU: 0.024, best_train_mIoU: 0.036, valid_mIoU: nan, best_valid_mIoU: nan

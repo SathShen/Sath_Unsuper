@@ -1,0 +1,17 @@
+Start on cuda:0!
+12 examples in training set and 4 examples in validation set
+epoch: 7, epoch_time: 38s, train_loss: 0.441, best_loss: 0.441, lr: 2.00e-02, train_mIoU: 0.042, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 8, epoch_time: 33s, train_loss: 0.451, best_loss: 0.441, lr: 2.00e-02, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 9, epoch_time: 38s, train_loss: 0.451, best_loss: 0.441, lr: 1.20e-02, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 10, epoch_time: 32s, train_loss: 0.451, best_loss: 0.441, lr: 1.20e-02, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 11, epoch_time: 1m10s, train_loss: 0.451, best_loss: 0.441, lr: 1.20e-02, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 12, epoch_time: 50s, train_loss: 0.451, best_loss: 0.441, lr: 7.20e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 13, epoch_time: 1m41s, train_loss: 0.451, best_loss: 0.441, lr: 7.20e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 14, epoch_time: 2m38s, train_loss: 0.451, best_loss: 0.441, lr: 7.20e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 15, epoch_time: 44s, train_loss: 0.451, best_loss: 0.441, lr: 4.32e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 16, epoch_time: 30s, train_loss: 0.451, best_loss: 0.441, lr: 4.32e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 17, epoch_time: 31s, train_loss: 0.451, best_loss: 0.441, lr: 4.32e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 18, epoch_time: 37s, train_loss: 0.451, best_loss: 0.441, lr: 2.59e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+epoch: 19, epoch_time: 35s, train_loss: 0.451, best_loss: 0.441, lr: 2.59e-03, train_mIoU: 0.021, best_train_mIoU: 0.042, valid_mIoU: 0.027, best_valid_mIoU: 0.027
+train_time: 11m38s, 0.22examples/sec, total_time: 11m38s, best_train_mIoU: 0.042, best_valid_mIoU: 0.027
+Finish!

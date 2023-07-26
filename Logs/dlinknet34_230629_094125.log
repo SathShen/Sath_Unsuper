@@ -1,0 +1,14 @@
+Start on cuda:0!
+22048 examples in training set and 9450 examples in validation set
+epoch: 0, epoch_time: 44m57s, train_loss: 0.021, best_loss: 0.021, lr: 2.00e-03, train_mIoU: 0.459, best_train_mIoU: 0.459, valid_mIoU: 0.471, best_valid_mIoU: 0.471
+epoch: 1, epoch_time: 44m19s, train_loss: 0.020, best_loss: 0.020, lr: 1.95e-03, train_mIoU: 0.589, best_train_mIoU: 0.589, valid_mIoU: 0.628, best_valid_mIoU: 0.628
+epoch: 2, epoch_time: 41m9s, train_loss: 0.019, best_loss: 0.019, lr: 1.81e-03, train_mIoU: 0.606, best_train_mIoU: 0.606, valid_mIoU: 0.615, best_valid_mIoU: 0.628
+epoch: 3, epoch_time: 40m6s, train_loss: 0.019, best_loss: 0.019, lr: 1.59e-03, train_mIoU: 0.618, best_train_mIoU: 0.618, valid_mIoU: 0.647, best_valid_mIoU: 0.647
+epoch: 4, epoch_time: 41m35s, train_loss: 0.018, best_loss: 0.018, lr: 1.32e-03, train_mIoU: 0.638, best_train_mIoU: 0.638, valid_mIoU: 0.640, best_valid_mIoU: 0.647
+epoch: 5, epoch_time: 40m10s, train_loss: 0.017, best_loss: 0.017, lr: 1.01e-03, train_mIoU: 0.678, best_train_mIoU: 0.678, valid_mIoU: 0.698, best_valid_mIoU: 0.698
+epoch: 6, epoch_time: 39m42s, train_loss: 0.017, best_loss: 0.017, lr: 7.04e-04, train_mIoU: 0.701, best_train_mIoU: 0.701, valid_mIoU: 0.675, best_valid_mIoU: 0.698
+epoch: 7, epoch_time: 42m44s, train_loss: 0.016, best_loss: 0.016, lr: 4.28e-04, train_mIoU: 0.713, best_train_mIoU: 0.713, valid_mIoU: 0.699, best_valid_mIoU: 0.699
+epoch: 8, epoch_time: 42m13s, train_loss: 0.016, best_loss: 0.016, lr: 2.09e-04, train_mIoU: 0.724, best_train_mIoU: 0.724, valid_mIoU: 0.707, best_valid_mIoU: 0.707
+epoch: 9, epoch_time: 43m9s, train_loss: 0.016, best_loss: 0.016, lr: 6.85e-05, train_mIoU: 0.726, best_train_mIoU: 0.726, valid_mIoU: 0.697, best_valid_mIoU: 0.707
+epoch: 10, epoch_time: 1h1m16s, train_loss: 0.018, best_loss: 0.016, lr: 2.00e-03, train_mIoU: 0.675, best_train_mIoU: 0.726, valid_mIoU: 0.670, best_valid_mIoU: 0.707
+epoch: 11, epoch_time: 1h14m16s, train_loss: 0.017, best_loss: 0.016, lr: 1.99e-03, train_mIoU: 0.685, best_train_mIoU: 0.726, valid_mIoU: 0.651, best_valid_mIoU: 0.707

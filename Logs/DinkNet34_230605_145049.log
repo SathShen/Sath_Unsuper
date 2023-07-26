@@ -1,0 +1,8 @@
+Start on cuda:0!
+12 examples in training set and 4 examples in validation set
+epoch: 0, epoch_time: 28s, train_loss: 0.459, best_loss: 0.459, lr: 0.002, train_mIoU: 0.021, best_train_mIoU: 0.021, valid_mIoU: 0.015, best_valid_mIoU: 0.015
+epoch: 1, epoch_time: 24s, train_loss: 0.436, best_loss: 0.436, lr: 0.002, train_mIoU: 0.024, best_train_mIoU: 0.024, valid_mIoU: 0.014, best_valid_mIoU: 0.015
+epoch: 2, epoch_time: 25s, train_loss: 0.427, best_loss: 0.427, lr: 0.002, train_mIoU: 0.025, best_train_mIoU: 0.025, valid_mIoU: 0.015, best_valid_mIoU: 0.015
+epoch: 3, epoch_time: 24s, train_loss: 0.421, best_loss: 0.421, lr: 0.002, train_mIoU: 0.025, best_train_mIoU: 0.025, valid_mIoU: 0.015, best_valid_mIoU: 0.015
+epoch: 4, epoch_time: 24s, train_loss: 0.419, best_loss: 0.419, lr: 0.002, train_mIoU: 0.048, best_train_mIoU: 0.048, valid_mIoU: 0.034, best_valid_mIoU: 0.034
+epoch: 5, epoch_time: 24s, train_loss: 0.429, best_loss: 0.419, lr: 0.002, train_mIoU: 0.041, best_train_mIoU: 0.048, valid_mIoU: 0.067, best_valid_mIoU: 0.067

@@ -1,0 +1,6 @@
+Predict on cuda:0!
+9450 examples in test set.
+evaluate_time: 4m58s, 31.70examples/sec
+===>PA: 0.965
+===>mPrecision: 0.915	mRecall: 0.744
+===>mIoU: 0.710	mF1-score: 0.804

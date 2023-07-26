@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Swin-Transformer-Semantic-Segmentation-main"
+		}
+	],
+	"settings": {}
+}
