@@ -65,18 +65,16 @@ class TrainFrame():
     def optimize(self):
         self.forward()
         self.optimizer.zero_grad()
-        with autocast():
-            preds = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
-            metrics_preds = cvt_posibility2class(preds).to(self.mdevice)
-            metrics_labs = batch_one_hot_decode(
-                self.labs, list(range(len(self.class_list))), self.mdevice).to(self.mdevice)
-            self.train_metrics.add_imgs(metrics_preds, metrics_labs)
-            l = self.loss_fuc(preds, self.labs)
-        self.scaler.scale(l).backward()
-        self.scaler.step(self.optimizer)
-        self.scaler.update()
-        # l.backward()
-        # self.optimizer.step()
+        preds = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
+
+        metrics_preds = cvt_posibility2class(preds).to(self.mdevice)
+        metrics_labs = batch_one_hot_decode(
+            self.labs, list(range(len(self.class_list))), self.mdevice).to(self.mdevice)
+        self.train_metrics.add_imgs(metrics_preds, metrics_labs)
+
+        l = self.loss_fuc(preds, self.labs)
+        l.backward()
+        self.optimizer.step()
         return l.item()
 
     def save_weights(self, train_data_path, net_name, cfg_note, epoch, best_mIoU, loss, dataset='train'):
