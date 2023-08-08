@@ -137,7 +137,7 @@ def build_optimizer(config, net):
     return optimizer
 
 
-def build_lrScheduler(config, optimizer, last_epoch):
+def build_scheduler(config, optimizer, last_epoch):
     if config.TRAIN.LR_SCHEDULER.NAME =='step':
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
                                                     step_size=config.TRAIN.LR_SCHEDULER.DECAY_EPOCHS, 

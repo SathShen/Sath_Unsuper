@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from Utils import SegmentationMetrics, try_gpu, check_gpus
 from tqdm import tqdm
-from Utils import build_net, build_loss, build_optimizer, build_lrScheduler, batch_one_hot_decode
+from Utils import build_net, build_loss, build_optimizer, build_scheduler, batch_one_hot_decode
 from torch.cuda.amp import autocast as autocast
 from torch.cuda.amp import GradScaler
 
@@ -42,7 +42,7 @@ class TrainFrame():
         # self.net = self.net.to(self.mdevice)
         self.loss_fuc = build_loss(cfgs)
         self.optimizer = build_optimizer(cfgs, self.net)
-        self.scheduler = build_lrScheduler(cfgs, self.optimizer, self.last_epoch)
+        self.scheduler = build_scheduler(cfgs, self.optimizer, self.last_epoch)
         if cfgs.NET.PRETRAIN_PATH:
             self.load_weights(cfgs.NET.PRETRAIN_PATH)
 

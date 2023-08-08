@@ -100,9 +100,28 @@ def build_net(config):
 
 
 def build_loss(config):
-    if config.TRAIN.LOSS.NAME == 'dinov2':
-        loss_func = DinoV2Loss(size_average=config.TRAIN.LOSS.IS_AVERAGE,
+    if config.TRAIN.LOSS.NAME == 'ce':
+        loss_func = CrossEntropyLoss(size_average=config.TRAIN.LOSS.IS_AVERAGE,
                                      ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
+    elif config.TRAIN.LOSS.NAME == 'bce':
+        loss_func = BCELoss(size_average=config.TRAIN.LOSS.IS_AVERAGE,
+                            ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
+    elif config.TRAIN.LOSS.NAME == 'focal':
+        loss_func = FocalLoss(alpha=config.TRAIN.LOSS.ALPHA,
+                              gamma=config.TRAIN.LOSS.GAMMA,
+                              size_average=config.TRAIN.LOSS.IS_AVERAGE,
+                              ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
+    elif config.TRAIN.LOSS.NAME == 'dice':
+        loss_func = DiceLoss(size_average=config.TRAIN.LOSS.IS_AVERAGE,
+                             ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
+    elif config.TRAIN.LOSS.NAME == 'dicebce':
+        loss_func = DiceBCELoss(a=config.TRAIN.LOSS.A,
+                                b=config.TRAIN.LOSS.B,
+                                size_average=config.TRAIN.LOSS.IS_AVERAGE,
+                                ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
+    elif config.TRAIN.LOSS.NAME == 'softiou':
+        loss_func = SoftIoULoss(size_average=config.TRAIN.LOSS.IS_AVERAGE,
+                                ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
     else:
         raise NotImplementedError(f"Unkown loss: {config.TRAIN.LOSS.NAME}")
     return loss_func
@@ -137,7 +156,7 @@ def build_optimizer(config, net):
     return optimizer
 
 
-def build_lrScheduler(config, optimizer, last_epoch):
+def build_scheduler(config, optimizer, last_epoch):
     if config.TRAIN.LR_SCHEDULER.NAME =='step':
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
                                                     step_size=config.TRAIN.LR_SCHEDULER.DECAY_EPOCHS, 
