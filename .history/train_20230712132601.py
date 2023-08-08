@@ -7,6 +7,8 @@ from Utils import Timer, Logger, LocalDatasetBuilder
 from Utils.config import get_config, save_config
 
 
+
+# 加入新模型swin, getchar
 def train(frame, cfgs):
     total_timer = Timer()
     epoch_timer = Timer()

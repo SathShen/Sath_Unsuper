@@ -5,4 +5,4 @@
 # LICENSE file in the root directory of this source tree.
 
 from .train import get_args_parser, main
-from ...Networks.DinoV2.dinov2 import DinoV2
+from .ssl_meta_arch import DinoV2

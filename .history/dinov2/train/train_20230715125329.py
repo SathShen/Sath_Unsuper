@@ -21,7 +21,7 @@ from dinov2.logging import MetricLogger
 from dinov2.utils.config import setup
 from dinov2.utils.utils import CosineScheduler
 
-from Networks.DinoV2.dinov2 import DinoV2
+from dinov2.train.ssl_meta_arch import SSLMetaArch
 
 
 torch.backends.cuda.matmul.allow_tf32 = True  # PyTorch 1.12 sets this to False by default
@@ -298,7 +298,7 @@ def do_train(cfg, model, resume=False):
 def main(args):
     cfg = setup(args)
 
-    model = DinoV2(cfg).to(torch.device("cuda"))
+    model = SSLMetaArch(cfg).to(torch.device("cuda"))
     model.prepare_for_distributed_training()
 
     logger.info("Model:\n{}".format(model))

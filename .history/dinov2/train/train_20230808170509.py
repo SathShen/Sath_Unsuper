@@ -21,7 +21,7 @@ from dinov2.logging import MetricLogger
 from dinov2.utils.config import setup
 from dinov2.utils.utils import CosineScheduler
 
-from Networks.DinoV2.dinov2 import DinoV2
+from dinov2.train.ssl_meta_arch import DinoV2
 
 
 torch.backends.cuda.matmul.allow_tf32 = True  # PyTorch 1.12 sets this to False by default
