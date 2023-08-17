@@ -75,7 +75,7 @@ def data_test(cfgs):
     num_cols = 4
     rint = random.randint(0, dataset1.__len__() - num_cols)
     imgs = []
-    for i in range(num_cols * num_rows):
+    for i in range(num_cols):
         img = dataset1[rint + i]
         imgs.append(img)
     show_examples(imgs, num_rows, num_cols)
@@ -101,7 +101,7 @@ def aug_test(cfgs):
 if __name__ == "__main__":
     test_cfg = CN()
     test_cfg.DATA = CN()
-    test_cfg.DATA.TRAIN_DATA_PATH = r'F:\Backup\Not_RS\classification\stl10\labeled'
+    test_cfg.DATA.TRAIN_DATA_PATH = r'E:\Sht\DATA\Test_data\GID_water'
     test_cfg.AUG = CN()
     test_cfg.AUG.IS_AUG = False
     test_cfg.AUG.INTENSITY = 0.4
@@ -113,5 +113,5 @@ if __name__ == "__main__":
     test_cfg.AUG.CROP_SIZE = 512
 
     data_test(test_cfg)
-    aug_test(test_cfg)
+    # aug_test(test_cfg)
 

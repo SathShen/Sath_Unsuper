@@ -75,7 +75,7 @@ def data_test(cfgs):
     num_cols = 4
     rint = random.randint(0, dataset1.__len__() - num_cols)
     imgs = []
-    for i in range(num_cols * num_rows):
+    for i in range(num_cols):
         img = dataset1[rint + i]
         imgs.append(img)
     show_examples(imgs, num_rows, num_cols)
@@ -113,5 +113,5 @@ if __name__ == "__main__":
     test_cfg.AUG.CROP_SIZE = 512
 
     data_test(test_cfg)
-    aug_test(test_cfg)
+    # aug_test(test_cfg)
 

@@ -4,6 +4,7 @@
 import torch
 from Networks import *
 from Utils.loss import *
+from Networks import *
 import torchvision.transforms as transforms
 import numpy as np
 
@@ -64,7 +65,6 @@ def build_net(config):
 
     if net_type == 'dino':
         if net_name == 'dinov2':
-            pass
             # net = DinoV2(config);
         # elif net_name == 'dinov1':
         #     net = DINOv1(config);
