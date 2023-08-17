@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import os
 import sys
-sys.path.append('./')
 import random
 from osgeo import gdal
 from Utils.builder import build_transform
@@ -12,6 +11,7 @@ from Utils.plot import show_examples, show_augs
 from Utils.augmentation import *
 from yacs.config import CfgNode as CN
 
+sys.path.append('/path/to/项目文件夹')
 
 def read_img_GDAL(path, data_type=np.uint8):
     dataset = gdal.Open(path)

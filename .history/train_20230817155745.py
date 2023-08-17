@@ -12,13 +12,13 @@ def train(frame, cfgs):
     epoch_timer = Timer()
     total_timer.start()
 
-    train_dataset = LocalDatasetBuilder(cfgs)
+    train_dataset = LocalDatasetBuilder(cfgs, cfgs.DATA.TRAIN_DATA_PATH, is_aug=cfgs.AUG.IS_AUG)
     train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfgs.DATA.BATCH_SIZE,
                                                      shuffle=True, num_workers=cfgs.DATA.NUM_WORKERS)
 
     logger = Logger(cfgs.NET.NAME, cfgs.CFG_NOTE)
     logger.log_in(f'Start on device_ids: {frame.device_ids}!', f'{train_dataset.__len__()} examples in training set')
-    best_loss = 999
+    best_loss, best_train_mIoU = 999, 999, 999
 
     for epoch in range(cfgs.TRAIN.START_EPOCH, cfgs.TRAIN.NUM_EPOCHS):
         epoch_timer.start()

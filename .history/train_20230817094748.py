@@ -12,13 +12,13 @@ def train(frame, cfgs):
     epoch_timer = Timer()
     total_timer.start()
 
-    train_dataset = LocalDatasetBuilder(cfgs)
+    train_dataset = LocalDatasetBuilder(cfgs, cfgs.DATA.TRAIN_DATA_PATH, is_aug=cfgs.AUG.IS_AUG)
     train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfgs.DATA.BATCH_SIZE,
                                                      shuffle=True, num_workers=cfgs.DATA.NUM_WORKERS)
 
     logger = Logger(cfgs.NET.NAME, cfgs.CFG_NOTE)
     logger.log_in(f'Start on device_ids: {frame.device_ids}!', f'{train_dataset.__len__()} examples in training set')
-    best_loss = 999
+    best_loss, best_train_mIoU = 999, 999, 999
 
     for epoch in range(cfgs.TRAIN.START_EPOCH, cfgs.TRAIN.NUM_EPOCHS):
         epoch_timer.start()
@@ -143,14 +143,19 @@ def get_parserargs():
 
 
     # Model parameters
-    parser.add_argument('--backbone', 'bb', default='vit_small', type=str, help='Name of architecture to train.')
+    parser.add_argument('--backbone', 'bb',default='vit_small', type=str, help='Name of architecture to train.')
+    parser.add_argument('--patch_size', default=16, type=int, help="""Size in pixels
+        of input square patches - default 16 (for 16x16 patches). Using smaller
+        values leads to better performance but requires more memory. Applies only
+        for ViTs (vit_tiny, vit_small and vit_base). If <16, we recommend disabling
+        mixed precision training (--use_fp16 false) to avoid unstabilities.""")
     parser.add_argument('--out_dim', default=65536, type=int, help="""Dimensionality of
         the DINO head output. For complex and large datasets large values (like 65k) work well.""")
     parser.add_argument('--norm_last_layer', default=True, type=utils.bool_flag,
         help="""Whether or not to weight normalize the last layer of the DINO head.
         Not normalizing leads to better performance but can make the training unstable.
         In our experiments, we typically set this paramater to False with vit_small and True with vit_base.""")
-    parser.add_argument('--momentum_ema', default=0.996, type=float, help="""Base EMA
+    parser.add_argument('--momentum_teacher', default=0.996, type=float, help="""Base EMA
         parameter for teacher update. The value is increased to 1 during training with cosine schedule.
         We recommend setting a higher value with small batches: for example use 0.9995 with batch size of 256.""")
     parser.add_argument('--use_bn_in_head', default=False, type=utils.bool_flag,
@@ -167,6 +172,15 @@ def get_parserargs():
         help='Number of warmup epochs for the teacher temperature (Default: 30).')
 
     # Training/Optimization parameters
+    parser.add_argument('--use_fp16', type=utils.bool_flag, default=True, help="""Whether or not
+        to use half precision for training. Improves training time and memory requirements,
+        but can provoke instability and slight decay of performance. We recommend disabling
+        mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
+    parser.add_argument('--weight_decay', type=float, default=0.04, help="""Initial value of the
+        weight decay. With ViT, a smaller value at the beginning of training works well.""")
+    parser.add_argument('--weight_decay_end', type=float, default=0.4, help="""Final value of the
+        weight decay. We use a cosine schedule for WD and using a larger decay by
+        the end of training improves performance for ViTs.""")
     parser.add_argument('--clip_grad', type=float, default=3.0, help="""Maximal parameter
         gradient norm if using gradient clipping. Clipping with norm .3 ~ 1.0 can
         help optimization for larger ViT architectures. 0 for disabling.""")
@@ -204,8 +218,11 @@ def get_parserargs():
         help='Please specify path to the ImageNet training data.')
     parser.add_argument('--output_dir', default=".", type=str, help='Path to save logs and checkpoints.')
     parser.add_argument('--saveckp_freq', default=20, type=int, help='Save checkpoint every x epochs.')
+    parser.add_argument('--seed', default=0, type=int, help='Random seed.')
     parser.add_argument('--num_workers', default=10, type=int, help='Number of data loading workers per GPU.')
-
+    parser.add_argument("--dist_url", default="env://", type=str, help="""url used to set up
+        distributed training; see https://pytorch.org/docs/stable/distributed.html""")
+    parser.add_argument("--local_rank", default=0, type=int, help="Please ignore and do not set this argument.")
 
     args, unknown = parser.parse_known_args()
 

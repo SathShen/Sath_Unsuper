@@ -1,7 +1,7 @@
 import torch
 import os
 from Utils import try_gpu, Timer, Logger, SegmentationMetrics, build_net, build_transform, one_hot_encode
-from Utils.dataset import default_loader, Class2Idx, Idx2Class
+from Utils.dataset import RS_loader, Class2Idx, Idx2Class
 from tqdm import tqdm
 import argparse
 from Utils.config import get_config, save_config
@@ -39,7 +39,7 @@ def evaluate(cfgs):
 
     with torch.no_grad():
         for img_name in tqdm(img_name_list, ncols=80):
-            img, lab = default_loader(img_name, img_path, lab_path, img_ext, lab_ext)
+            img, lab = RS_loader(img_name, img_path, lab_path, img_ext, lab_ext)
             img_auged, lab_auged = trans(img, lab)    
             img_auged = img_auged.unsqueeze(0).to(mdevice)   # 1 channels h w
             lab_auged = lab_auged.to(mdevice)   # 1 h w

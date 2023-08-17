@@ -4,12 +4,11 @@ import cv2
 import numpy as np
 import os
 import sys
-sys.path.append('./')
 import random
 from osgeo import gdal
-from Utils.builder import build_transform
-from Utils.plot import show_examples, show_augs
-from Utils.augmentation import *
+from . import build_transform
+from . import show_examples, show_augs
+from . import *
 from yacs.config import CfgNode as CN
 
 

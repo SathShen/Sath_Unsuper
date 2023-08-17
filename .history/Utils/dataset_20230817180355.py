@@ -4,7 +4,8 @@ import cv2
 import numpy as np
 import os
 import sys
-sys.path.append('./')
+
+sys.path.append('/path/to/项目文件夹')
 import random
 from osgeo import gdal
 from Utils.builder import build_transform

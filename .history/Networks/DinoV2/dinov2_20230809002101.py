@@ -9,14 +9,15 @@ import logging
 
 import torch
 from torch import nn
+
 from Utils.loss import DINOLoss, iBOTPatchLoss, KoLeoLoss
-from vit import build_model_from_cfg
-from vit.layers import DINOHead
+from dinov2.models import build_model_from_cfg
+from dinov2.layers import DINOHead
 from dinov2.utils.utils import has_batchnorms
 from dinov2.utils.param_groups import get_params_groups_with_decay, fuse_params_groups
 from dinov2.fsdp import get_fsdp_wrapper, ShardedGradScaler, get_fsdp_modules, reshard_fsdp_model
 
-from vit.vision_transformer import BlockChunk
+from dinov2.models.vision_transformer import BlockChunk
 
 try:
     from xformers.ops import fmha

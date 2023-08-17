@@ -26,7 +26,7 @@ def show_examples(imgs, num_rows, num_cols, title_list=None, scale=1.5):
     return axes
 
 
-def show_augs(img, augs, num_rows, num_cols, title_list=None, scale=1.5):
+def show_augs(img, lab, augs, num_rows, num_cols, title_list=None, scale=1.5):
     """input HWC ndarray"""
     imgs_auged = [0 for i in range(num_rows * num_cols)]
     for i in range(num_cols):

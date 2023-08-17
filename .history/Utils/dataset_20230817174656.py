@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import os
 import sys
-sys.path.append('./')
 import random
 from osgeo import gdal
 from Utils.builder import build_transform
@@ -70,47 +69,47 @@ class LocalDatasetBuilder(data.Dataset):
         return len(self.img_path_list)
 
 
-def data_test(cfgs):
-    dataset1 = LocalDatasetBuilder(cfgs)
+def data_test():
+    dataset1 = LocalDatasetBuilder(data_path=r'E:\Sht\DATA\Test_data\GID_water', label_idx_list=label_idx_list)
     num_rows = 2
     num_cols = 4
     rint = random.randint(0, dataset1.__len__() - num_cols)
     imgs = []
     for i in range(num_cols):
-        img = dataset1[rint + i]
+        img = dataset1[rint + i][0]
         imgs.append(img)
+    for i in range(num_cols):
+        lab = one_hot_decode(dataset1[rint + i][1], label_idx_list)
+        imgs.append(lab)
     show_examples(imgs, num_rows, num_cols)
 
 
-def aug_test(cfgs):
-    dataset1 = LocalDatasetBuilder(cfgs)
+def aug_test():
+    label_idx_list = [0, 255]
+    dataset1 = LocalDatasetBuilder(data_path=r'E:\Sht\DATA\Test_data\GID_water', label_idx_list=label_idx_list)
     num_rows = 2
     num_cols = 4
     rint = random.randint(0, dataset1.__len__())
-    img = dataset1[rint].numpy().transpose((1, 2, 0))           # 因为要做增强，所以要先转numpy
+    img = dataset1[rint][0].numpy().transpose((1, 2, 0))           # 因为要做增强，所以要先转numpy
+    lab = one_hot_decode(dataset1[rint][1], label_idx_list).numpy().transpose((1, 2, 0))
     trans = ExtCompose([    # 输入:rgbn... hwc uint8 ndarry -> rgbn... chw float32 tensor
         ExtToTensor(),
         ExtRandomHorizontalFlip(),  # 随机水平反转
         ExtRandomVerticalFlip(),    # 随机垂直反转
         ExtRandomResizedCrop(size=(512, 512), scale=(0.3, 1), ratio=(3. / 4, 4. / 3)),
         ExtColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.2)])
-    show_augs(img, trans, num_rows, num_cols)
+    show_augs(img, lab, trans, num_rows, num_cols)
 
 
 if __name__ == "__main__":
-    test_cfg = CN()
-    test_cfg.DATA = CN()
-    test_cfg.DATA.TRAIN_DATA_PATH = r'E:\Sht\DATA\Test_data\GID_water'
-    test_cfg.AUG = CN()
-    test_cfg.AUG.IS_AUG = False
-    test_cfg.AUG.INTENSITY = 0.4
-    test_cfg.AUG.HUE = 0.2
-    test_cfg.AUG.SATURATION = 0.3
-    test_cfg.AUG.CONTRAST = 0.3
-    test_cfg.AUG.CROP_PER = 0.4
-    test_cfg.AUG.RESIZE_RATIO = 0.3
-    test_cfg.AUG.CROP_SIZE = 512
+    base_cfg = CN()
 
-    data_test(test_cfg)
-    # aug_test(test_cfg)
+    base_cfg.DATA = CN()
+# Batch size for a single GPU, could be overwritten by command line argument
+base_cfg.DATA.BATCH_SIZE = 4
+# Path to dataset, could be overwritten by command line argument
+base_cfg.DATA.TRAIN_DATA_PATH = ''
+    data_test()
+    aug_test()
+    # one_hot_test()
 
