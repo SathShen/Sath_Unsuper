@@ -241,12 +241,12 @@ def build_transform(cfgs, is_aug):
     t = transforms.Compose([  
         transforms.ToTensor()])
     if is_aug:
-        t.append(transforms.RandomHorizontalFlip())
-        t.append(transforms.RandomVerticalFlip())
-        t.append(transforms.RandomResizedCrop(size=cfgs.AUG.CROP_SIZE, 
+        t.append(ExtRandomHorizontalFlip())
+        t.append(ExtRandomVerticalFlip())
+        t.append(ExtRandomResizedCrop(size=cfgs.AUG.CROP_SIZE, 
                                       scale=(cfgs.AUG.CROP_PER, 1), 
                                       ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)))
-        t.append(transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, 
+        t.append(ExtColorJitter(brightness=cfgs.AUG.INTENSITY, 
                                 contrast=cfgs.AUG.CONTRAST, 
                                 saturation=cfgs.AUG.SATURATION, 
                                 hue=cfgs.AUG.HUE))

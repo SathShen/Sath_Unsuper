@@ -93,9 +93,8 @@ def aug_test(cfgs):
         transforms.RandomHorizontalFlip(),  # 随机水平反转
         transforms.RandomVerticalFlip(),    # 随机垂直反转
         transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
-                                     ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
-        transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
-                               saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE)])
+                                     ratio=(3. / 4, 4. / 3)),
+        transforms.ColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.2)])
     show_augs(img, trans, num_rows, num_cols)
 
 
