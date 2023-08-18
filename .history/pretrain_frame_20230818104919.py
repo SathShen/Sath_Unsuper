@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from Utils import SegmentationMetrics, try_gpu, check_gpus
 from tqdm import tqdm
-from Utils import build_net, build_loss, build_optimizer, build_scheduler, batch_one_hot_decode
+from Utils import build_net, build_loss, build_optimizer, build_lrscheduler, batch_one_hot_decode
 from torch.cuda.amp import autocast as autocast
 from torch.cuda.amp import GradScaler
 
@@ -17,10 +17,9 @@ def cvt_posibility2class(preds):
     return preds.type(torch.uint8)
 
 
-class TrainFrame():
+class PretrainFrame():
     def __init__(self, cfgs):
         self.last_epoch = cfgs.TRAIN.START_EPOCH - 1
-        
         self.class_list = cfgs.DATA.CLASS_LIST
         self.lr = cfgs.TRAIN.LEARNING_RATE
 
@@ -40,10 +39,9 @@ class TrainFrame():
         else:
             raise AssertionError("Invalid device ids")
         
-        # self.net = self.net.to(self.mdevice)
         self.loss_fuc = build_loss(cfgs)
         self.optimizer = build_optimizer(cfgs, self.net)
-        self.scheduler = build_scheduler(cfgs, self.optimizer, self.last_epoch)
+        self.lr_scheduler = build_lrscheduler(cfgs, self.optimizer, self.last_epoch)
         self.scaler = GradScaler()
 
         if cfgs.NET.PRETRAIN_PATH:
@@ -56,14 +54,11 @@ class TrainFrame():
         self.train_metrics = SegmentationMetrics(cfgs.DATA.NUM_CLASSES)
         self.valid_metrics = SegmentationMetrics(cfgs.DATA.NUM_CLASSES)
 
-    def set_input(self, imgs, labs):
+    def set_input(self, imgs):
         self.imgs = imgs
-        self.labs = labs
 
     def forward(self, volatile=False):
         self.imgs = Variable(self.imgs.to(self.mdevice), volatile=volatile)
-        if self.labs is not None:
-            self.labs = Variable(self.labs.to(self.mdevice), volatile=volatile)
 
     def optimize(self):
         self.forward()
@@ -75,6 +70,7 @@ class TrainFrame():
                 self.labs, list(range(len(self.class_list))), self.mdevice).to(self.mdevice)
             self.train_metrics.add_imgs(metrics_preds, metrics_labs)
             l = self.loss_fuc(preds, self.labs)
+            
         self.scaler.scale(l).backward()
         self.scaler.step(self.optimizer)
         self.scaler.update()
@@ -114,28 +110,5 @@ class TrainFrame():
 
 
     def update_lr(self):
-        self.scheduler.step()
-        self.lr = self.scheduler.get_last_lr()[0]
-
-
-    def validiate(self, valid_data_loader_iter):
-        with torch.no_grad():
-            for imgs, labs in tqdm(valid_data_loader_iter, ncols=80):
-                imgs = imgs.to(self.mdevice)
-                labs = labs.to(self.mdevice)
-                preds = self.net(imgs)
-                metrics_preds = cvt_posibility2class(preds).to(self.mdevice)
-                metrics_labs = batch_one_hot_decode(
-                    labs, list(range(len(self.class_list))), self.mdevice).to(self.mdevice)
-                self.valid_metrics.add_imgs(metrics_preds, metrics_labs)
-
-
-def test():
-    a = torch.randn((4, 3, 5, 5))
-    b = cvt_posibility2class(a)
-    print(a)
-    print(b)
-
-
-if __name__ == "__main__":
-    test()
+        self.lr_scheduler.step()
+        self.lr = self.lr_scheduler.get_last_lr()[0]

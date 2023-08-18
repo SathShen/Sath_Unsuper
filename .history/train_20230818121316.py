@@ -37,6 +37,14 @@ def train(frame, cfgs):
             if train_epoch_loss < best_loss:
                 best_loss = train_epoch_loss
                 frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, train_epoch_loss)
+            if frame.train_metrics.macro_IoU() > best_train_mIoU:
+                best_train_mIoU = frame.train_metrics.macro_IoU()
+                frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                                   best_train_mIoU, train_epoch_loss, dataset='train')
+            if frame.valid_metrics.macro_IoU() > best_valid_mIoU:
+                best_valid_mIoU = frame.valid_metrics.macro_IoU()
+                frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                                   best_valid_mIoU, train_epoch_loss, dataset='valid')
         epoch_timer.stop()
         logger.log_in(f'epoch: {epoch}, epoch_time: {epoch_timer.get_epochtime()}, '
                       f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, '

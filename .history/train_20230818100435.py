@@ -2,7 +2,7 @@ import argparse
 import torch
 from tqdm import tqdm
 import torch.utils.data
-from pretrain_frame import PretrainFrame
+from frame import TrainFrame
 from Utils import Timer, Logger, LocalDatasetBuilder
 from Utils.config import get_config, save_config
 
@@ -32,23 +32,38 @@ def train(frame, cfgs):
 
         if epoch == cfgs.TRAIN.START_EPOCH:
             best_loss = train_epoch_loss
-            frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, train_epoch_loss)
+            best_train_mIoU = frame.train_metrics.macro_IoU()
+            best_valid_mIoU = frame.valid_metrics.macro_IoU()
+            frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                               best_train_mIoU, train_epoch_loss, dataset='train')
+            frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                               best_valid_mIoU, train_epoch_loss, dataset='valid')
         else:
             if train_epoch_loss < best_loss:
                 best_loss = train_epoch_loss
-                frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, train_epoch_loss)
+            if frame.train_metrics.macro_IoU() > best_train_mIoU:
+                best_train_mIoU = frame.train_metrics.macro_IoU()
+                frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                                   best_train_mIoU, train_epoch_loss, dataset='train')
+            if frame.valid_metrics.macro_IoU() > best_valid_mIoU:
+                best_valid_mIoU = frame.valid_metrics.macro_IoU()
+                frame.save_weights(cfgs.DATA.TRAIN_DATA_PATH, cfgs.NET.NAME, cfgs.CFG_NOTE, epoch, 
+                                   best_valid_mIoU, train_epoch_loss, dataset='valid')
         epoch_timer.stop()
         logger.log_in(f'epoch: {epoch}, epoch_time: {epoch_timer.get_epochtime()}, '
-                      f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, '
-                      f'lr: {frame.lr:.2e}, ')   # FIXME schedulers...wd...momentum...
-            
+                      f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, lr: {frame.lr:.2e}, '
+                      f'train_mIoU: {frame.train_metrics.macro_IoU():.3f}, best_train_mIoU: {best_train_mIoU:.3f}, '
+                      f'valid_mIoU: {frame.valid_metrics.macro_IoU():.3f}, best_valid_mIoU: {best_valid_mIoU:.3f}')
+        frame.train_metrics.reset()
+        frame.valid_metrics.reset()
         frame.update_lr()
         logger.flush()
 
     total_timer.stop()
     logger.log_in(f'train_time: {epoch_timer.get_sumtime()}, '
                   f'{train_dataset.__len__() * (cfgs.TRAIN.NUM_EPOCHS - cfgs.TRAIN.START_EPOCH) / epoch_timer.sum():.2f}examples/sec, '
-                  f'total_time: {total_timer.get_sumtime()}, best_loss: {best_loss:.3f}', 'Finish!')
+                  f'total_time: {total_timer.get_sumtime()}, '
+                  f'best_train_mIoU: {best_train_mIoU:.3f}, best_valid_mIoU: {best_valid_mIoU:.3f}', 'Finish!')
 
 def get_parserargs():
     parser = argparse.ArgumentParser(description='Train the network on images using Pytorch')
@@ -269,5 +284,5 @@ def init_args(args):
 if __name__ == '__main__':
     cfgs = get_parserargs()
 
-    frame = PretrainFrame(cfgs)
+    frame = TrainFrame(cfgs)
     train(frame, cfgs)
