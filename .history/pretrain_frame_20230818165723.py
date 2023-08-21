@@ -28,7 +28,6 @@ class PretrainFrame():
                 print('No GPU available, training on CPU')
             self.mdevice = try_gpu(cfgs.DEVICE_IDS[0])
             self.student = self.student.to(self.mdevice)
-            self.teacher = self.teacher.to(self.mdevice)
         else:
             raise AssertionError("Invalid device ids")
         

@@ -11,7 +11,7 @@ import torch
 from torch import nn
 from Utils.loss import DINOLoss, iBOTPatchLoss, KoLeoLoss    # 三个loss
 from .vit import build_model_from_cfg                        # build techer model and student model
-from .vit.layers import DINOHead                             
+from .vit.layers import DINOHead
 from dinov2.utils.utils import has_batchnorms
 from dinov2.utils.param_groups import get_params_groups_with_decay, fuse_params_groups
 from dinov2.fsdp import get_fsdp_wrapper, ShardedGradScaler, get_fsdp_modules, reshard_fsdp_model

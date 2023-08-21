@@ -14,26 +14,24 @@ class PretrainFrame():
         self.class_list = cfgs.DATA.CLASS_LIST
         self.lr = cfgs.TRAIN.LEARNING_RATE
 
-        self.student = build_net(cfgs)
-        self.teacher = build_net(cfgs)
+        self.net = build_net(cfgs)
         
         if check_gpus(cfgs.DEVICE_IDS):
             self.device_ids = cfgs.DEVICE_IDS
             if torch.cuda.device_count() > 1:
-                self.student = torch.nn.DataParallel(self.student, device_ids=cfgs.DEVICE_IDS)
-                self.teacher = torch.nn.DataParallel(self.teacher, device_ids=cfgs.DEVICE_IDS)
+                self.net = torch.nn.DataParallel(self.net, device_ids=cfgs.DEVICE_IDS)
+                # model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[config.LOCAL_RANK], broadcast_buffers=False) # 分布式计算
             elif torch.cuda.device_count() == 1:
                 pass
             else:
                 print('No GPU available, training on CPU')
             self.mdevice = try_gpu(cfgs.DEVICE_IDS[0])
-            self.student = self.student.to(self.mdevice)
-            self.teacher = self.teacher.to(self.mdevice)
+            self.net = self.net.to(self.mdevice)
         else:
             raise AssertionError("Invalid device ids")
         
         self.loss_fuc = build_loss(cfgs)
-        self.optimizer = build_optimizer(cfgs, self.student)
+        self.optimizer = build_optimizer(cfgs, self.net)
         self.lr_scheduler = build_lrscheduler(cfgs, self.optimizer, self.last_epoch)
         self.scaler = GradScaler()
 
@@ -41,7 +39,7 @@ class PretrainFrame():
             self.load_weights(cfgs.NET.PRETRAIN_PATH)
 
         if cfgs.IS_EVAL:
-            for i in self.student.modules():
+            for i in self.net.modules():
                 if isinstance(i, nn.BatchNorm2d):
                     i.eval()     # 不启用 BatchNormalization 和 Dropout
 
@@ -55,7 +53,7 @@ class PretrainFrame():
         self.forward()
         self.optimizer.zero_grad()
         with autocast():
-            preds = self.student(self.imgs)   # pred: batch_size, num_classes, H, W
+            preds = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
             l = self.loss_fuc(preds)
             
         self.scaler.scale(l).backward()
@@ -80,19 +78,19 @@ class PretrainFrame():
                     os.remove(f'{train_data_path}/{weight_names}')
                     path = f"{train_data_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
                     torch.save({'epoch': epoch,
-                                'model_state_dict': self.student.state_dict(),
+                                'model_state_dict': self.net.state_dict(),
                                 'optimizer_state_dict': self.optimizer.state_dict(),
                                 'loss': best_loss}, path)
         else:
             path = f"{train_data_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
             torch.save({'epoch': epoch,
-                        'model_state_dict': self.student.state_dict(),
+                        'model_state_dict': self.net.state_dict(),
                         'optimizer_state_dict': self.optimizer.state_dict(),
                         'loss': best_loss}, path)
             
     def load_weights(self, weight_path):
         checkpoint = torch.load(weight_path)
-        self.student.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        self.net.load_state_dict(checkpoint['model_state_dict'], strict=False)
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.epoch = checkpoint['epoch']
         self.loss = checkpoint['loss']

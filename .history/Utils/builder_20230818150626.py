@@ -64,9 +64,10 @@ def build_net(config):
 
     if net_type == 'dino':
         if net_name == 'dinov2':
-            net = DinoV2(config);
-        elif net_name == 'dinov1':
-            net = DINOv1(config);
+            pass
+            # net = DinoV2(config);
+        # elif net_name == 'dinov1':
+        #     net = DINOv1(config);
     if net_type == 'simmim':
         if net_name == 'simmim':
             encoder = SwinTransformerForSimMIM(img_size=config.AUG.CROP_SIZE,

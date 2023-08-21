@@ -21,14 +21,13 @@ class PretrainFrame():
             self.device_ids = cfgs.DEVICE_IDS
             if torch.cuda.device_count() > 1:
                 self.student = torch.nn.DataParallel(self.student, device_ids=cfgs.DEVICE_IDS)
-                self.teacher = torch.nn.DataParallel(self.teacher, device_ids=cfgs.DEVICE_IDS)
+                # model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[config.LOCAL_RANK], broadcast_buffers=False) # 分布式计算
             elif torch.cuda.device_count() == 1:
                 pass
             else:
                 print('No GPU available, training on CPU')
             self.mdevice = try_gpu(cfgs.DEVICE_IDS[0])
             self.student = self.student.to(self.mdevice)
-            self.teacher = self.teacher.to(self.mdevice)
         else:
             raise AssertionError("Invalid device ids")
         
