@@ -9,7 +9,7 @@ import os
 import yaml
 import time
 from yacs.config import CfgNode as CN
-import argparse
+
 
 # <editor-fold desc="base config setting">
 base_cfg = CN()
@@ -247,20 +247,6 @@ def get_nettype(netname):
         return 'dlinknet'
 
 
-def bool_flag(str):
-    """
-    Parse boolean arguments from the command line.
-    """
-    FALSY_STRINGS = {"off", "false", "0"}
-    TRUTHY_STRINGS = {"on", "true", "1"}
-    if str.lower() in FALSY_STRINGS:
-        return False
-    elif str.lower() in TRUTHY_STRINGS:
-        return True
-    else:
-        raise argparse.ArgumentTypeError("invalid value for a boolean flag")
-
-
 def _update_config_from_file(config, cfg_file):
     config.defrost()
     with open(cfg_file, 'r') as f:
@@ -299,9 +285,9 @@ def update_config(config, args):
     if _check_args('device_ids'):
         config.DEVICE_IDS = args.device_ids
     if _check_args('is_eval'):
-        config.IS_EVAL = bool_flag(args.is_eval)
+        config.IS_EVAL = args.is_eval
     if _check_args('is_save_pred'):
-        config.IS_SAVE_PRED = bool_flag(args.is_save_pred)
+        config.IS_SAVE_PRED = args.is_save_pred
 
     if _check_args('train_data_path'):
         config.DATA.TRAIN_DATA_PATH = args.train_data_path
@@ -321,7 +307,7 @@ def update_config(config, args):
         config.DATA.BATCH_SIZE = args.batch_size
 
     if _check_args('is_aug'):
-        config.AUG.IS_AUG = bool_flag(args.is_aug)
+        config.AUG.IS_AUG = args.is_aug
     if _check_args('aug_size'):
         config.AUG.CROP_SIZE = args.aug_size
     if _check_args('aug_scale'):

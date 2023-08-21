@@ -148,7 +148,14 @@ def get_parserargs():
 
 
     # dino v1 args
-    # Model parameters
+     # Model parameters
+    
+    
+
+
+    
+
+    
     # Training/Optimization parameters
     
     parser.add_argument('--weight_decay', type=float, default=0.04, help="""Initial value of the

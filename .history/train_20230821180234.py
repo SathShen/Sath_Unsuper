@@ -58,30 +58,32 @@ def get_parserargs():
     parser = argparse.ArgumentParser(description='Train the network on images using Pytorch')
 
     # ==========training setting==========
-    parser.add_argument('--on_cmd', '-cmd', default=False, help='If training on cmd, set on_cmd True')
+    parser.add_argument('--on_cmd', '-cmd', type=bool, default=False, help='If training on cmd, set on_cmd True')
     parser.add_argument('--cfg_path', '-cfg', type=str, default=None, metavar="CFG", help='path to load a local config file')
     parser.add_argument("--opts", help="Modify config options by adding 'KEY VALUE' pairs. ", default=None, nargs='+')
     parser.add_argument('--cfg_note', '-cn', metavar='CN', type=str, help='note which will be saved in config name')
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')
     parser.add_argument('--device_ids', '-d', metavar='D', type=int, nargs='+', help='device ids which is training on, first is the major')
-    parser.add_argument('--is_eval', '-ev', metavar='EV', help='the eval mode or not')
-    parser.add_argument('--is_fp16', '-fp16', metavar='FP16', default=True, help=""" Improves time and memory requirements, but can provoke instability and decay of performance. 
-                        We recommend disabling mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
+    parser.add_argument('--is_eval', '-ev', metavar='EV', type=bool, help='the eval mode or not')
+
     # ==========data setting==========
     parser.add_argument('--train_data_path', '-tp', metavar='TP', type=str, help='Training dataset abspath')
+    parser.add_argument('--valid_data_path', '-vp', metavar='VP', type=str, help='Validation dataset abspath')
+    parser.add_argument('--class_list', '-cl', metavar='CL', type=int, nargs='+', help='label classes index list')
     parser.add_argument('--num_workers', '-nw', metavar='NW', type=int, help='number of workers in dataloader')
-    parser.add_argument('--batch_size', '-b', metavar='B', type=int, help='Batch size per gpu')
+    parser.add_argument('--batch_size', '-b', metavar='B', type=int, help='Batch size')
     # augmentation setting
-    parser.add_argument('--is_aug', '-a', metavar='AUG', help='Use augmentations or not')
-    parser.add_argument('--aug_size', '-asi', metavar='ASI', type=int, help='Output size in cropresize')
-    parser.add_argument('--aug_scale', '-asc', metavar='ASC', type=float, help='Minimum cropping percentage in one image')
-    parser.add_argument('--aug_ratio', '-ar', metavar='AR', type=float, help='Maximum height to aspect ratio of crop')
+    parser.add_argument('--is_aug', '-a', metavar='AUG', type= bool, help='Use augmentations or not')
+    parser.add_argument('--aug_size', '-asi', metavar='ASI', type=int, help='Image size that input network, if aug, it will be crop size')
+    parser.add_argument('--aug_scale', '-asc', metavar='ASC', type=float, help='min crop scale percentage in one image')
+    parser.add_argument('--aug_ratio', '-ar', metavar='AR', type=float, help='max crop scale percentage in one image')
     parser.add_argument('--aug_intensity', '-ai', metavar='AI', type=float, help='intensity of color jitter')
     parser.add_argument('--aug_hue', '-ah', metavar='AH', type=float, help='hue of color jitter')
     parser.add_argument('--aug_saturation', '-asa', metavar='ASA', type=float, help='saturation of color jitter')
     parser.add_argument('--aug_contrast', '-ac', metavar='AC', type=float, help='contrast of color jitter')
 
     # ==========hyperparams setting==========
+    parser.add_argument('--learning_rate', '-lr', metavar='LR', type=float, help='Learning rate')
     parser.add_argument('--num_epochs', '-e', metavar='E', type=int, help='Number of training epochs')
     parser.add_argument('--use_checkpoint', '-uc', metavar='UC', type=bool, help='use checkpoint or not')
 
@@ -89,12 +91,11 @@ def get_parserargs():
     parser.add_argument('--net_name', '-n', metavar='N', type=str, help='Network name, DlinkNet34, DlinkNet50, Unet, swin...')
     parser.add_argument('--net_dropout_rate', '-ndr', metavar='NDR', type=float, help='dropout rate')
     parser.add_argument('--net_dropout_path_rate', '-ndpr', metavar='NDPR', type=float, help='stochastic depth dropout path rate')
-    parser.add_argument('--net_patch_size', '-nps', metavar='NPS', default=16, type=int, help="""Using smaller values leads to better performance but requires more memory. 
+    parser.add_argument('--patch_size', default=16, type=int, help="""Using smaller values leads to better performance but requires more memory. 
                         If <16, we recommend disabling mixed precision training (--use_fp16 false) to avoid unstabilities.""")
     parser.add_argument('--out_dim', default=65536, type=int, help="""Output dim. For complex and large datasets large values (like 65k) work well.""")
-    parser.add_argument('--ema', default=0.996, type=float, help="""Base EMA for teacher update. The value is increased to 1 with cosine schedule.
-                        We recommend setting this to 0.9995 with batch size of 256.""")
     # (swinv2unet)
+    parser.add_argument('--net_swinv2unet_patch_size', '-nsups', metavar='NSUPS', type=int, help='patch size of swin')
     parser.add_argument('--net_swinv2unet_in_chans', '-nsuic', metavar='NSUIC', type=int, help='in channels of swin')
     parser.add_argument('--net_swinv2unet_embed_dim', '-nsued', metavar='NSUED', type=int, help='embed dim of swin')
     parser.add_argument('--net_swinv2unet_depths', '-nsudp', metavar='NSUDP', type=int, nargs='+', help='depths of swin')
@@ -106,9 +107,6 @@ def get_parserargs():
     parser.add_argument('--net_swinv2unet_patch_norm', '-nsupn', metavar='NSUPN', type=bool, help='patch norm of swin')
     parser.add_argument('--net_swinv2unet_pretrained_window_sizes', '-nsupws', metavar='NSUPWS', type=int, nargs='+', help='pretrained window sizes of swin')
     # (dino)
-    parser.add_argument('--is_norm_last_layer', default=True,
-        help="""Not normalizing leads to better performance but can make the training unstable. we typically set False with small and True with base.""")
-    parser.add_argument('--is_bn_in_head', default=False, help="Whether to use batch normalizations in projection head (Default: False)")
     
     
     # loss setting
@@ -118,39 +116,56 @@ def get_parserargs():
     parser.add_argument('--loss_dicebce_b', '-ldbb', metavar='LDBB', type=float, help='b of dicebce loss function')
     parser.add_argument('--loss_focal_alpha', '-lfa', metavar='LFA', type=float, help='alpha of focal loss function')
     parser.add_argument('--loss_focal_gamma', '-lfg', metavar='LFG', type=float, help='gamma of focal loss function')
-
     # optimizer setting
     parser.add_argument('--optim_name', '-o', metavar='O', type=str, help='Optimizer name, sgd, adam, rmsprop, adamw...')
     parser.add_argument('--optim_momentum', '- omm', metavar='OMM', type=float, help='beta of momentum vt, some do not need')
     parser.add_argument('--optim_weight_decay', '-owd', metavar='OWD', type=float, help='lambda of weight decay')
     parser.add_argument('--optim_eps', '-oe', metavar='OE', type=float, help='eps of adam, rmsprop, adamw...')
     parser.add_argument('--optim_betas', '-obt', metavar='OBT', type=float, nargs=2, help='betas of adam, adamw...')
-
     # lr scheduler setting
-    parser.add_argument('--learning_rate', '-lr', metavar='LR', type=float, help='Learning rate')
-    parser.add_argument('--lrs_T_max', '-lrstma', metavar='LRSTMA', type=int, help='T_max of cosinewarm scheduler')
-    parser.add_argument('--lrs_step_size', '-lrsss', metavar='LRSSS', type=int, help='step size of step scheduler')
-    parser.add_argument('--lrs_decay_rate', '-lrsdc', metavar='LRSDC', type=float, help='decay rate of step scheduler, etc gamma of stepLR')
-    parser.add_argument('--lrs_T_mult', '-lrstmu', metavar='LRSTMU', type=int, help='T_mult of cosinewarm scheduler')
-    parser.add_argument('--lrs_eta_min', '-lrsetm', metavar='LRSETM', type=float, help='eta_min of cosinewarm scheduler')
-    parser.add_argument('--lrs_milestones', '-lrsml', metavar='LRSML', type=list, help='milestones of multistep scheduler')
-
-    # teacher temperature scheduler setting
-    parser.add_argument('--teacher_temp', '-tt', default=0.04, type=float, help="""Initial value for the teacher temperature: 0.04 works well in most cases.
-        Try decreasing it if the training loss does not decrease.""")
-    parser.add_argument('--warmup_teacher_temp', default=0.04, type=float,
-        help="""Initial value for the teacher temperature: 0.04 works well in most cases.
-        Try decreasing it if the training loss does not decrease.""")
-    parser.add_argument('--warmup_teacher_temp_epochs', default=0, type=int,
-        help='Number of warmup epochs for the teacher temperature (Default: 30).')
+    parser.add_argument('--sche_name', '-s', metavar='S', type=str,
+                        help='Learning rate scheduler name, step, multistep, cosine, cosinewarm...')
+    parser.add_argument('--sche_step_size', '-sss', metavar='SSS', type=int, help='step size of step scheduler')
+    parser.add_argument('--sche_decay_rate', '-sdc', metavar='SDC', type=float, help='decay rate of step scheduler, etc gamma of stepLR')
+    parser.add_argument('--sche_T_max', '-stma', metavar='STMA', type=int, help='T_max of cosinewarm scheduler')
+    parser.add_argument('--sche_T_mult', '-stmu', metavar='STMU', type=int, help='T_mult of cosinewarm scheduler')
+    parser.add_argument('--sche_eta_min', '-setm', metavar='SETM', type=float, help='eta_min of cosinewarm scheduler')
+    parser.add_argument('--sche_milestones', '-sml', metavar='SML', type=list, help='milestones of multistep scheduler')
 
 
 
 
     # dino v1 args
-    # Model parameters
-    # Training/Optimization parameters
+     # Model parameters
+    parser.add_argument('--out_dim', default=65536, type=int, help="""Dimensionality of
+        the DINO head output. For complex and large datasets large values (like 65k) work well.""")
+    parser.add_argument('--norm_last_layer', default=True, type=utils.bool_flag,
+        help="""Whether or not to weight normalize the last layer of the DINO head.
+        Not normalizing leads to better performance but can make the training unstable.
+        In our experiments, we typically set this paramater to False with vit_small and True with vit_base.""")
+    parser.add_argument('--momentum_teacher', default=0.996, type=float, help="""Base EMA
+        parameter for teacher update. The value is increased to 1 during training with cosine schedule.
+        We recommend setting a higher value with small batches: for example use 0.9995 with batch size of 256.""")
+    parser.add_argument('--use_bn_in_head', default=False, type=utils.bool_flag,
+        help="Whether to use batch normalizations in projection head (Default: False)")
+
+    # Temperature teacher parameters
+    parser.add_argument('--warmup_teacher_temp', default=0.04, type=float,
+        help="""Initial value for the teacher temperature: 0.04 works well in most cases.
+        Try decreasing it if the training loss does not decrease.""")
+    parser.add_argument('--teacher_temp', default=0.04, type=float, help="""Final value (after linear warmup)
+        of the teacher temperature. For most experiments, anything above 0.07 is unstable. We recommend
+        starting with the default value of 0.04 and increase this slightly if needed.""")
+    parser.add_argument('--warmup_teacher_temp_epochs', default=0, type=int,
+        help='Number of warmup epochs for the teacher temperature (Default: 30).')
     
+
+    
+    # Training/Optimization parameters
+    parser.add_argument('--use_fp16', type=utils.bool_flag, default=True, help="""Whether or not
+        to use half precision for training. Improves training time and memory requirements,
+        but can provoke instability and slight decay of performance. We recommend disabling
+        mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
     parser.add_argument('--weight_decay', type=float, default=0.04, help="""Initial value of the
         weight decay. With ViT, a smaller value at the beginning of training works well.""")
     parser.add_argument('--weight_decay_end', type=float, default=0.4, help="""Final value of the

@@ -65,8 +65,7 @@ def get_parserargs():
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')
     parser.add_argument('--device_ids', '-d', metavar='D', type=int, nargs='+', help='device ids which is training on, first is the major')
     parser.add_argument('--is_eval', '-ev', metavar='EV', help='the eval mode or not')
-    parser.add_argument('--is_fp16', '-fp16', metavar='FP16', default=True, help=""" Improves time and memory requirements, but can provoke instability and decay of performance. 
-                        We recommend disabling mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
+
     # ==========data setting==========
     parser.add_argument('--train_data_path', '-tp', metavar='TP', type=str, help='Training dataset abspath')
     parser.add_argument('--num_workers', '-nw', metavar='NW', type=int, help='number of workers in dataloader')
@@ -108,7 +107,7 @@ def get_parserargs():
     # (dino)
     parser.add_argument('--is_norm_last_layer', default=True,
         help="""Not normalizing leads to better performance but can make the training unstable. we typically set False with small and True with base.""")
-    parser.add_argument('--is_bn_in_head', default=False, help="Whether to use batch normalizations in projection head (Default: False)")
+    parser.add_argument('--is_use_bn_in_head', default=False, help="Whether to use batch normalizations in projection head (Default: False)")
     
     
     # loss setting
@@ -128,19 +127,20 @@ def get_parserargs():
 
     # lr scheduler setting
     parser.add_argument('--learning_rate', '-lr', metavar='LR', type=float, help='Learning rate')
-    parser.add_argument('--lrs_T_max', '-lrstma', metavar='LRSTMA', type=int, help='T_max of cosinewarm scheduler')
     parser.add_argument('--lrs_step_size', '-lrsss', metavar='LRSSS', type=int, help='step size of step scheduler')
     parser.add_argument('--lrs_decay_rate', '-lrsdc', metavar='LRSDC', type=float, help='decay rate of step scheduler, etc gamma of stepLR')
+    parser.add_argument('--lrs_T_max', '-lrstma', metavar='LRSTMA', type=int, help='T_max of cosinewarm scheduler')
     parser.add_argument('--lrs_T_mult', '-lrstmu', metavar='LRSTMU', type=int, help='T_mult of cosinewarm scheduler')
     parser.add_argument('--lrs_eta_min', '-lrsetm', metavar='LRSETM', type=float, help='eta_min of cosinewarm scheduler')
     parser.add_argument('--lrs_milestones', '-lrsml', metavar='LRSML', type=list, help='milestones of multistep scheduler')
 
     # teacher temperature scheduler setting
-    parser.add_argument('--teacher_temp', '-tt', default=0.04, type=float, help="""Initial value for the teacher temperature: 0.04 works well in most cases.
-        Try decreasing it if the training loss does not decrease.""")
-    parser.add_argument('--warmup_teacher_temp', default=0.04, type=float,
-        help="""Initial value for the teacher temperature: 0.04 works well in most cases.
-        Try decreasing it if the training loss does not decrease.""")
+    parser.add_argument('--teacher_temp', '-tt', default=0.04, type=float, help="""Final value (after linear warmup)
+        of the teacher temperature. For most experiments, anything above 0.07 is unstable. We recommend
+        starting with the default value of 0.04 and increase this slightly if needed.""")
+    parser.add_argument('--teacher_temp', default=0.04, type=float, help="""Final value (after linear warmup)
+        of the teacher temperature. For most experiments, anything above 0.07 is unstable. We recommend
+        starting with the default value of 0.04 and increase this slightly if needed.""")
     parser.add_argument('--warmup_teacher_temp_epochs', default=0, type=int,
         help='Number of warmup epochs for the teacher temperature (Default: 30).')
 
@@ -148,9 +148,19 @@ def get_parserargs():
 
 
     # dino v1 args
-    # Model parameters
-    # Training/Optimization parameters
+     # Model parameters
     
+    
+
+
+    
+
+    
+    # Training/Optimization parameters
+    parser.add_argument('--use_fp16', type=utils.bool_flag, default=True, help="""Whether or not
+        to use half precision for training. Improves training time and memory requirements,
+        but can provoke instability and slight decay of performance. We recommend disabling
+        mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
     parser.add_argument('--weight_decay', type=float, default=0.04, help="""Initial value of the
         weight decay. With ViT, a smaller value at the beginning of training works well.""")
     parser.add_argument('--weight_decay_end', type=float, default=0.4, help="""Final value of the

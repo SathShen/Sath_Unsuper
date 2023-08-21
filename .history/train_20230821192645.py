@@ -65,7 +65,7 @@ def get_parserargs():
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')
     parser.add_argument('--device_ids', '-d', metavar='D', type=int, nargs='+', help='device ids which is training on, first is the major')
     parser.add_argument('--is_eval', '-ev', metavar='EV', help='the eval mode or not')
-    parser.add_argument('--is_fp16', '-fp16', metavar='FP16', default=True, help=""" Improves time and memory requirements, but can provoke instability and decay of performance. 
+    parser.add_argument('--is_fp16', '-fp16', metavar='FP16', default=True, help=""" Improves training time and memory requirements, but can provoke instability and slight decay of performance. 
                         We recommend disabling mixed precision if the loss is unstable, if reducing the patch size or if training with bigger ViTs.""")
     # ==========data setting==========
     parser.add_argument('--train_data_path', '-tp', metavar='TP', type=str, help='Training dataset abspath')
@@ -148,7 +148,14 @@ def get_parserargs():
 
 
     # dino v1 args
-    # Model parameters
+     # Model parameters
+    
+    
+
+
+    
+
+    
     # Training/Optimization parameters
     
     parser.add_argument('--weight_decay', type=float, default=0.04, help="""Initial value of the
