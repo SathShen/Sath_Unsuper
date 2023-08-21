@@ -3,11 +3,11 @@ import vit.vision_transformer as vits
 from vit.vision_transformer import DINOHead
 
 # new module class
-class DinoV2(nn.Module):
+class DinoV1(nn.Module):
     def __init__(self):
-        super(DinoV2, self).__init__()
+        super(DinoV1, self).__init__()
         
-        self.head = 
+        self.dino_head = DINOHead
         self.student = nn.Sequential(
             
         )

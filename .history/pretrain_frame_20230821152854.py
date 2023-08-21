@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from Utils import try_gpu, check_gpus
-from Utils import build_net, build_loss, build_optimizer, build_schedulers
+from Utils import build_net, build_loss, build_optimizer, build_lrscheduler
 from torch.cuda.amp import autocast as autocast
 from torch.cuda.amp import GradScaler
 
@@ -34,11 +34,17 @@ class PretrainFrame():
         self.loss_fuc = build_loss(cfgs)
         self.optimizer = build_optimizer(cfgs, self.student)
 
-        (self.lr_schedule,
-        self.wd_schedule,
-        self.momentum_schedule,
-        self.teacher_temp_schedule,
-        self.last_layer_lr_schedule) = build_schedulers(cfgs)
+        (
+        lr_schedule,
+        wd_schedule,
+        momentum_schedule,
+        teacher_temp_schedule,
+        last_layer_lr_schedule,
+    ) = build_schedulers(cfg)
+        self.lr_scheduler = CosineScheduler(cfgs, self.optimizer, self.last_epoch)
+        self.wd_scheduler = CosineScheduler(cfgs.base_value, cfgs.final_value, self.total_iters)
+        self.momentum_scheduler = CosineScheduler(cfgs.base_value, cfgs.final_value, self.total_iters)
+        self.teacher_temp_scheduler = CosineScheduler(cfgs.base_value, cfgs.final_value, self.total_iters)
 
         self.fp16_scaler = GradScaler()
 

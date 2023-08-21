@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from Utils import try_gpu, check_gpus
-from Utils import build_net, build_loss, build_optimizer, build_schedulers
+from Utils import build_net, build_loss, build_optimizer, build_lrscheduler
 from torch.cuda.amp import autocast as autocast
 from torch.cuda.amp import GradScaler
 
@@ -14,8 +14,12 @@ class PretrainFrame():
         self.class_list = cfgs.DATA.CLASS_LIST
         self.lr = cfgs.TRAIN.LEARNING_RATE
 
-        self.net = build_net(cfgs)
+        student_model_dict = dict()
+        teacher_model_dict = dict()
 
+        self.student = build_net(cfgs)
+        self.teacher = build_net(cfgs)
+        
         if check_gpus(cfgs.DEVICE_IDS):
             self.device_ids = cfgs.DEVICE_IDS
             if torch.cuda.device_count() > 1:
@@ -33,14 +37,8 @@ class PretrainFrame():
         
         self.loss_fuc = build_loss(cfgs)
         self.optimizer = build_optimizer(cfgs, self.student)
-
-        (self.lr_schedule,
-        self.wd_schedule,
-        self.momentum_schedule,
-        self.teacher_temp_schedule,
-        self.last_layer_lr_schedule) = build_schedulers(cfgs)
-
-        self.fp16_scaler = GradScaler()
+        self.lr_scheduler = build_lrscheduler(cfgs, self.optimizer, self.last_epoch)
+        self.scaler = GradScaler()
 
         if cfgs.NET.PRETRAIN_PATH:
             self.load_weights(cfgs.NET.PRETRAIN_PATH)
@@ -63,9 +61,9 @@ class PretrainFrame():
             preds = self.student(self.imgs)   # pred: batch_size, num_classes, H, W
             l = self.loss_fuc(preds)
             
-        self.fp16_scaler.scale(l).backward()
-        self.fp16_scaler.step(self.optimizer)
-        self.fp16_scaler.update()
+        self.scaler.scale(l).backward()
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
         # l.backward()
         # self.optimizer.step()
         return l.item()

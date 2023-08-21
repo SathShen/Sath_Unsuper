@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from Utils import try_gpu, check_gpus
-from Utils import build_net, build_loss, build_optimizer, build_schedulers
+from Utils import build_net, build_loss, build_optimizer, build_lrscheduler
 from torch.cuda.amp import autocast as autocast
 from torch.cuda.amp import GradScaler
 
@@ -14,39 +14,38 @@ class PretrainFrame():
         self.class_list = cfgs.DATA.CLASS_LIST
         self.lr = cfgs.TRAIN.LEARNING_RATE
 
-        self.net = build_net(cfgs)
-
+        self.student_model_dict = dict()
+        self.teacher_model_dict = dict()
+        self.student_backbone = build_net(cfgs)
+        self.teacher_backbone = build_net(cfgs)
+        self.student_model_dict["backbone"] = self.student_backbone
+        self.teacher_model_dict["backbone"] = self.teacher_backbone
+        
         if check_gpus(cfgs.DEVICE_IDS):
             self.device_ids = cfgs.DEVICE_IDS
             if torch.cuda.device_count() > 1:
-                self.student = torch.nn.DataParallel(self.student, device_ids=cfgs.DEVICE_IDS)
-                self.teacher = torch.nn.DataParallel(self.teacher, device_ids=cfgs.DEVICE_IDS)
+                self.student_backbone = torch.nn.DataParallel(self.student_backbone, device_ids=cfgs.DEVICE_IDS)
+                self.teacher_backbone = torch.nn.DataParallel(self.teacher_backbone, device_ids=cfgs.DEVICE_IDS)
             elif torch.cuda.device_count() == 1:
                 pass
             else:
                 print('No GPU available, training on CPU')
             self.mdevice = try_gpu(cfgs.DEVICE_IDS[0])
-            self.student = self.student.to(self.mdevice)
-            self.teacher = self.teacher.to(self.mdevice)
+            self.student_backbone = self.student_backbone.to(self.mdevice)
+            self.teacher_backbone = self.teacher_backbone.to(self.mdevice)
         else:
             raise AssertionError("Invalid device ids")
         
         self.loss_fuc = build_loss(cfgs)
-        self.optimizer = build_optimizer(cfgs, self.student)
-
-        (self.lr_schedule,
-        self.wd_schedule,
-        self.momentum_schedule,
-        self.teacher_temp_schedule,
-        self.last_layer_lr_schedule) = build_schedulers(cfgs)
-
-        self.fp16_scaler = GradScaler()
+        self.optimizer = build_optimizer(cfgs, self.student_backbone)
+        self.lr_scheduler = build_lrscheduler(cfgs, self.optimizer, self.last_epoch)
+        self.scaler = GradScaler()
 
         if cfgs.NET.PRETRAIN_PATH:
             self.load_weights(cfgs.NET.PRETRAIN_PATH)
 
         if cfgs.IS_EVAL:
-            for i in self.student.modules():
+            for i in self.student_backbone.modules():
                 if isinstance(i, nn.BatchNorm2d):
                     i.eval()     # 不启用 BatchNormalization 和 Dropout
 
@@ -60,12 +59,12 @@ class PretrainFrame():
         self.forward()
         self.optimizer.zero_grad()
         with autocast():
-            preds = self.student(self.imgs)   # pred: batch_size, num_classes, H, W
+            preds = self.student_backbone(self.imgs)   # pred: batch_size, num_classes, H, W
             l = self.loss_fuc(preds)
             
-        self.fp16_scaler.scale(l).backward()
-        self.fp16_scaler.step(self.optimizer)
-        self.fp16_scaler.update()
+        self.scaler.scale(l).backward()
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
         # l.backward()
         # self.optimizer.step()
         return l.item()
@@ -85,19 +84,19 @@ class PretrainFrame():
                     os.remove(f'{train_data_path}/{weight_names}')
                     path = f"{train_data_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
                     torch.save({'epoch': epoch,
-                                'model_state_dict': self.student.state_dict(),
+                                'model_state_dict': self.student_backbone.state_dict(),
                                 'optimizer_state_dict': self.optimizer.state_dict(),
                                 'loss': best_loss}, path)
         else:
             path = f"{train_data_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
             torch.save({'epoch': epoch,
-                        'model_state_dict': self.student.state_dict(),
+                        'model_state_dict': self.student_backbone.state_dict(),
                         'optimizer_state_dict': self.optimizer.state_dict(),
                         'loss': best_loss}, path)
             
     def load_weights(self, weight_path):
         checkpoint = torch.load(weight_path)
-        self.student.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        self.student_backbone.load_state_dict(checkpoint['model_state_dict'], strict=False)
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.epoch = checkpoint['epoch']
         self.loss = checkpoint['loss']

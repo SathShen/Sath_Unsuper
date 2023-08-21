@@ -5,4 +5,4 @@
 # LICENSE file in the root directory of this source tree.
 
 from .dinov2_loss import *
-from .dinov1_loss import DinoV1Loss
+from .dinov1_loss import *

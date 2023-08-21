@@ -187,13 +187,17 @@ def build_schedulers(cfg):
         start_warmup_value=cfg.teacher["warmup_teacher_temp"],
     )
 
-    lr_schedule = CosineScheduler(**lr)
-    wd_schedule = CosineScheduler(**wd)
-    momentum_schedule = CosineScheduler(**momentum)
-    teacher_temp_schedule = CosineScheduler(**teacher_temp)
-    last_layer_lr_schedule = CosineScheduler(**lr)
+    lr_schedule = CosineSchedulerIter(**lr)
+    wd_schedule = CosineSchedulerIter(**wd)
+    momentum_schedule = CosineSchedulerIter(**momentum)
+    teacher_temp_schedule = CosineSchedulerIter(**teacher_temp)
+    last_layer_lr_schedule = CosineSchedulerIter(**lr)
 
-    last_layer_lr_schedule.schedule[:cfg.optim["freeze_last_layer_epochs"] * OFFICIAL_EPOCH_LENGTH] = 0  # mimicking the original schedules
+    last_layer_lr_schedule.schedule[
+        : cfg.optim["freeze_last_layer_epochs"] * OFFICIAL_EPOCH_LENGTH
+    ] = 0  # mimicking the original schedules
+
+    logger.info("Schedulers ready.")
 
     return (
         lr_schedule,

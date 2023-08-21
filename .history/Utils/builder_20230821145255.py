@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 import numpy as np
 
 
-class CosineScheduler(object):
+class CosineSchedulerIter(object):
     def __init__(self, base_value, final_value, total_iters, warmup_iters=0, start_warmup_value=0, freeze_iters=0):
         super().__init__()
         self.final_value = final_value
@@ -160,6 +160,33 @@ def build_optimizer(config, net):
     return optimizer
 
 
+def build_lrscheduler(config, optimizer, last_epoch):
+    if config.TRAIN.LR_SCHEDULER.NAME =='step':
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+                                                    step_size=config.TRAIN.LR_SCHEDULER.DECAY_EPOCHS, 
+                                                    gamma=config.TRAIN.LR_SCHEDULER.DECAY_RATE, 
+                                                    last_epoch=last_epoch)
+    elif config.TRAIN.LR_SCHEDULER.NAME == 'cosine':
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+                                                               T_max=config.TRAIN.LR_SCHEDULER.T_MAX, 
+                                                               eta_min=config.TRAIN.LR_SCHEDULER.ETA_MIN, 
+                                                               last_epoch=last_epoch)
+    elif config.TRAIN.LR_SCHEDULER.NAME =='multistep':
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, 
+                                                         milestones=config.TRAIN.LR_SCHEDULER.MULTISTEPS, 
+                                                         gamma=config.TRAIN.LR_SCHEDULER.DECAY_RATE, 
+                                                         last_epoch=last_epoch)
+    elif config.TRAIN.LR_SCHEDULER.NAME == 'cosinewarm':
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer,
+                                                                         T_0=config.TRAIN.LR_SCHEDULER.T_MAX, 
+                                                                         T_mult=config.TRAIN.LR_SCHEDULER.T_MULT, 
+                                                                         eta_min=config.TRAIN.LR_SCHEDULER.ETA_MIN, 
+                                                                         last_epoch=last_epoch)
+    else:
+        raise NotImplementedError(f"Unkown scheduler: {config.TRAIN.LR_SCHEDULER.NAME}")
+    return scheduler
+
+
 def build_schedulers(cfg):
     OFFICIAL_EPOCH_LENGTH = cfg.train.OFFICIAL_EPOCH_LENGTH
     lr = dict(
@@ -187,13 +214,17 @@ def build_schedulers(cfg):
         start_warmup_value=cfg.teacher["warmup_teacher_temp"],
     )
 
-    lr_schedule = CosineScheduler(**lr)
-    wd_schedule = CosineScheduler(**wd)
-    momentum_schedule = CosineScheduler(**momentum)
-    teacher_temp_schedule = CosineScheduler(**teacher_temp)
-    last_layer_lr_schedule = CosineScheduler(**lr)
+    lr_schedule = CosineSchedulerIter(**lr)
+    wd_schedule = CosineSchedulerIter(**wd)
+    momentum_schedule = CosineSchedulerIter(**momentum)
+    teacher_temp_schedule = CosineSchedulerIter(**teacher_temp)
+    last_layer_lr_schedule = CosineSchedulerIter(**lr)
 
-    last_layer_lr_schedule.schedule[:cfg.optim["freeze_last_layer_epochs"] * OFFICIAL_EPOCH_LENGTH] = 0  # mimicking the original schedules
+    last_layer_lr_schedule.schedule[
+        : cfg.optim["freeze_last_layer_epochs"] * OFFICIAL_EPOCH_LENGTH
+    ] = 0  # mimicking the original schedules
+
+    logger.info("Schedulers ready.")
 
     return (
         lr_schedule,

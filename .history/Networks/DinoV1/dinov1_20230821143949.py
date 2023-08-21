@@ -14,8 +14,6 @@ class DinoV1(nn.Module):
         self.teacher_head = DINOHead(embed_dim, args.out_dim, args.use_bn_in_head)
 
     def forward(self, imgs):
-        s1 = self.student(imgs)
-        t1 = self.teacher(imgs)
-        student_output = self.student_head(s1)
-        teacher_output = self.teacher_head(t1)
-        return student_output, teacher_output
+        student_output = self.student(imgs)
+        out = self.teacher_head(student_output)
+        return out

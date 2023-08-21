@@ -38,7 +38,7 @@ class PretrainFrame():
         self.wd_schedule,
         self.momentum_schedule,
         self.teacher_temp_schedule,
-        self.last_layer_lr_schedule) = build_schedulers(cfgs)
+        self.last_layer_lr_schedule) = build_schedulers(cfg)
 
         self.fp16_scaler = GradScaler()
 
