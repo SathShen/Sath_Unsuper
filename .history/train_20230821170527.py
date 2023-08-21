@@ -20,7 +20,6 @@ def train(frame, cfgs):
     logger.log_in(f'Start on device_ids: {frame.device_ids}!', f'{train_dataset.__len__()} examples in training set')
     best_loss = 999
 
-    it = cfgs.start_iteration
     for epoch in range(cfgs.TRAIN.START_EPOCH, cfgs.TRAIN.NUM_EPOCHS):
         epoch_timer.start()
         train_data_loader_iter = iter(train_data_loader)
@@ -29,7 +28,7 @@ def train(frame, cfgs):
             frame.set_input(imgs)                 
             l = frame.optimize(it, epoch)
             train_epoch_loss += l
-            it += 1
+            
         train_epoch_loss /= len(train_data_loader_iter)
 
         # EMA update for the teacher

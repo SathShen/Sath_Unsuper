@@ -20,7 +20,7 @@ def train(frame, cfgs):
     logger.log_in(f'Start on device_ids: {frame.device_ids}!', f'{train_dataset.__len__()} examples in training set')
     best_loss = 999
 
-    it = cfgs.start_iteration
+    iteration = start_iter
     for epoch in range(cfgs.TRAIN.START_EPOCH, cfgs.TRAIN.NUM_EPOCHS):
         epoch_timer.start()
         train_data_loader_iter = iter(train_data_loader)

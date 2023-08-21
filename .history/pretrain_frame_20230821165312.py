@@ -34,11 +34,11 @@ class PretrainFrame():
         self.loss_fuc = build_loss(cfgs)
         self.optimizer = build_optimizer(cfgs, self.student)
 
-        (self.lr_scheduler,
-        self.wd_scheduler,
-        self.momentum_scheduler,
-        self.teacher_temp_scheduler,
-        self.last_layer_lr_scheduler) = build_schedulers(cfgs)
+        (self.lr_schedule,
+        self.wd_schedule,
+        self.momentum_schedule,
+        self.teacher_temp_schedule,
+        self.last_layer_lr_schedule) = build_schedulers(cfgs)
 
         self.fp16_scaler = GradScaler()
 
@@ -50,41 +50,24 @@ class PretrainFrame():
                 if isinstance(i, nn.BatchNorm2d):
                     i.eval()     # 不启用 BatchNormalization 和 Dropout
 
-    def apply_optim_scheduler(optimizer, lr, wd, last_layer_lr):
-        for param_group in optimizer.param_groups:
-            is_last_layer = param_group["is_last_layer"]
-            lr_multiplier = param_group["lr_multiplier"]
-            wd_multiplier = param_group["wd_multiplier"]
-            param_group["weight_decay"] = wd * wd_multiplier
-            param_group["lr"] = (last_layer_lr if is_last_layer else lr) * lr_multiplier
-
     def set_input(self, imgs):
         self.imgs = imgs
 
-    def optimize(self, it, epoch):
-        self.imgs = Variable(self.imgs.to(self.mdevice), volatile=False)
+    def forward(self, volatile=False):
+        self.imgs = Variable(self.imgs.to(self.mdevice), volatile=volatile)
 
-        # apply schedules
-        lr = self.lr_scheduler[it]
-        wd = self.wd_scheduler[it]
-        last_layer_lr = self.last_layer_lr_scheduler[it]
-        self.apply_optim_scheduler(self.optimizer, lr, wd, last_layer_lr)
-
-        teacher_temp = self.teacher_temp_scheduler[it]
+    def optimize(self, epoch):
+        self.forward()
         self.optimizer.zero_grad()
         with autocast():
             s1, t1 = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
-            l = self.loss_fuc(s1, t1, teacher_temp)  # FIXME 去掉epoch换成直接给temp
+            l = self.loss_fuc(s1, t1, self.epoch)
+            
         self.fp16_scaler.scale(l).backward()
         self.fp16_scaler.step(self.optimizer)
         self.fp16_scaler.update()
-
-        # EMA update for the teacher
-        with torch.no_grad():
-            mom = self.momentum_scheduler[it]  # momentum parameter
-            for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
-                param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
-                
+        # l.backward()
+        # self.optimizer.step()
         return l.item()
 
     def save_weights(self, train_data_path, net_name, cfg_note, epoch, best_loss):

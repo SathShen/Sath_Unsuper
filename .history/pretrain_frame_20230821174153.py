@@ -71,20 +71,18 @@ class PretrainFrame():
         self.apply_optim_scheduler(self.optimizer, lr, wd, last_layer_lr)
 
         teacher_temp = self.teacher_temp_scheduler[it]
+
         self.optimizer.zero_grad()
         with autocast():
             s1, t1 = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
             l = self.loss_fuc(s1, t1, teacher_temp)  # FIXME 去掉epoch换成直接给temp
+            
         self.fp16_scaler.scale(l).backward()
         self.fp16_scaler.step(self.optimizer)
         self.fp16_scaler.update()
 
         # EMA update for the teacher
-        with torch.no_grad():
-            mom = self.momentum_scheduler[it]  # momentum parameter
-            for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
-                param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
-                
+        mom = self.momentum_scheduler[it]
         return l.item()
 
     def save_weights(self, train_data_path, net_name, cfg_note, epoch, best_loss):

@@ -80,11 +80,11 @@ class PretrainFrame():
         self.fp16_scaler.update()
 
         # EMA update for the teacher
+        mom = self.momentum_scheduler[it]
         with torch.no_grad():
-            mom = self.momentum_scheduler[it]  # momentum parameter
-            for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
-                param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
-                
+            m = momentum_schedule[it]  # momentum parameter
+            for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
+                param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
         return l.item()
 
     def save_weights(self, train_data_path, net_name, cfg_note, epoch, best_loss):
