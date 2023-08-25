@@ -5,20 +5,15 @@ import random
 
 
 class HazeSimulation(object):
-    def __init__(self, p=0.2, t=(0.3, 0.7)):
+    def __init__(self, p=0.5, t=0.7):
         self.p = p
-        if isinstance(t, tuple) and len(t) == 2:
-            self.tm = t
-        elif isinstance(t, float):
-            self.tm = (t, 1.)
-        else:
-            raise TypeError('t should be float or tuple with length 2')
+        self.t = t
 
     def __call__(self, img):
         if random.random() > self.p:
             return img
-        trans_ratio = random.uniform(*self.tm)
-        self.transmition_map = torch.full(img.shape, trans_ratio)
+        trans_ratio = random.uniform(self.t, 1.0)
+        self.transmition_map = torch.full(img.shape, self.t)
         num_pixels = img.shape[-2] * img.shape[-1]
         num_A = num_pixels // 100
         A = (torch.sort(img.sum(dim=0).reshape(-1), descending=True)[0][:num_A] / 3).mean() 

@@ -74,7 +74,7 @@ def data_test(cfgs):
     dataset1 = LocalDatasetBuilder(cfgs)
     num_rows = 2
     num_cols = 4
-    rint = random.randint(0, dataset1.__len__() - num_cols* num_rows)
+    rint = random.randint(0, dataset1.__len__() - num_cols)
     imgs = []
     for i in range(num_cols * num_rows):
         img = dataset1[rint + i]
@@ -90,13 +90,13 @@ def aug_test(cfgs):
     img = dataset1[rint].numpy().transpose((1, 2, 0))           # 因为要做增强，所以要先转numpy
     trans = transforms.Compose([    # 输入:rgbn... hwc uint8 ndarry -> rgbn... chw float32 tensor
         transforms.ToTensor(),
-        transforms.RandomHorizontalFlip(),  # 随机水平反转
-        transforms.RandomVerticalFlip(),    # 随机垂直反转
-        transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
-                                     ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
-        transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
-                               saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE),
-        HazeSimulation()
+        # transforms.RandomHorizontalFlip(),  # 随机水平反转
+        # transforms.RandomVerticalFlip(),    # 随机垂直反转
+        # transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
+        #                              ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
+        # transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
+        #                        saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE),
+        HazeSimulation(p=0.9)
                                ])
     show_augs(img, trans, num_rows, num_cols)
 
@@ -104,7 +104,7 @@ def aug_test(cfgs):
 if __name__ == "__main__":
     test_cfg = CN()
     test_cfg.DATA = CN()
-    test_cfg.DATA.TRAIN_DATA_PATH = r'F:\Test_data\GID_water\train\image'
+    test_cfg.DATA.TRAIN_DATA_PATH = r'F:\Backup\Not_RS\classification\stl10\labeled'
     test_cfg.AUG = CN()
     test_cfg.AUG.IS_AUG = False
     test_cfg.AUG.INTENSITY = 0.4
@@ -115,6 +115,6 @@ if __name__ == "__main__":
     test_cfg.AUG.RESIZE_RATIO = 0.3
     test_cfg.AUG.CROP_SIZE = 512
 
-    # data_test(test_cfg)
+    data_test(test_cfg)
     aug_test(test_cfg)
 

@@ -5,7 +5,7 @@ import random
 
 
 class HazeSimulation(object):
-    def __init__(self, p=0.2, t=(0.3, 0.7)):
+    def __init__(self, p=0.5, t=(0.5, 0.9)):
         self.p = p
         if isinstance(t, tuple) and len(t) == 2:
             self.tm = t

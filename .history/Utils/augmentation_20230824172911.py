@@ -1,33 +1,12 @@
+
 import torchvision.transforms as transforms
 import PIL.Image as Image
-import torch
+import numpy as np
 import random
-
-
-class HazeSimulation(object):
-    def __init__(self, p=0.2, t=(0.3, 0.7)):
-        self.p = p
-        if isinstance(t, tuple) and len(t) == 2:
-            self.tm = t
-        elif isinstance(t, float):
-            self.tm = (t, 1.)
-        else:
-            raise TypeError('t should be float or tuple with length 2')
-
-    def __call__(self, img):
-        if random.random() > self.p:
-            return img
-        trans_ratio = random.uniform(*self.tm)
-        self.transmition_map = torch.full(img.shape, trans_ratio)
-        num_pixels = img.shape[-2] * img.shape[-1]
-        num_A = num_pixels // 100
-        A = (torch.sort(img.sum(dim=0).reshape(-1), descending=True)[0][:num_A] / 3).mean() 
-        img = img * self.transmition_map + A * (1 - self.transmition_map)
-        return img
-
+import math
 
 class DinoV1Augmentation(object):
-    def __init__(self, cfgs):
+    def __init__(self, global_crops_scale, local_crops_scale, local_crops_number):
         flip_and_color_jitter = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomApply(

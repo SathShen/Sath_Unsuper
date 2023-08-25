@@ -11,7 +11,7 @@ from Utils.builder import build_transform
 from Utils.plot import show_examples, show_augs
 from yacs.config import CfgNode as CN
 import torchvision.transforms.functional as F
-from Utils.augmentation import HazeSimulation
+
 
 def read_img_GDAL(path, data_type=np.uint8):
     dataset = gdal.Open(path)
@@ -74,7 +74,7 @@ def data_test(cfgs):
     dataset1 = LocalDatasetBuilder(cfgs)
     num_rows = 2
     num_cols = 4
-    rint = random.randint(0, dataset1.__len__() - num_cols* num_rows)
+    rint = random.randint(0, dataset1.__len__() - num_cols)
     imgs = []
     for i in range(num_cols * num_rows):
         img = dataset1[rint + i]
@@ -95,16 +95,14 @@ def aug_test(cfgs):
         transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
                                      ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
         transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
-                               saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE),
-        HazeSimulation()
-                               ])
+                               saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE)])
     show_augs(img, trans, num_rows, num_cols)
 
 
 if __name__ == "__main__":
     test_cfg = CN()
     test_cfg.DATA = CN()
-    test_cfg.DATA.TRAIN_DATA_PATH = r'F:\Test_data\GID_water\train\image'
+    test_cfg.DATA.TRAIN_DATA_PATH = r'F:\Backup\Not_RS\classification\stl10\labeled'
     test_cfg.AUG = CN()
     test_cfg.AUG.IS_AUG = False
     test_cfg.AUG.INTENSITY = 0.4
@@ -115,6 +113,6 @@ if __name__ == "__main__":
     test_cfg.AUG.RESIZE_RATIO = 0.3
     test_cfg.AUG.CROP_SIZE = 512
 
-    # data_test(test_cfg)
+    data_test(test_cfg)
     aug_test(test_cfg)
 

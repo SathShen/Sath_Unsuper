@@ -32,9 +32,8 @@ def show_augs(img, augs, num_rows, num_cols, title_list=None, scale=1.5):
     for i in range(num_cols * num_rows):
         if i == 0:
             imgs_auged[i] = img
-        else:
-            img_auged = augs(img)
-            imgs_auged[i] = img_auged
+        img_auged = augs(img)
+        imgs_auged[i] = img_auged
     show_examples(imgs_auged, num_rows, num_cols, title_list, scale)
 
 

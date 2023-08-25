@@ -222,8 +222,8 @@ def build_schedulers(cfg):
 
 
 def build_transform(cfgs, is_aug):
-    # if cfgs.NET.NAME == 'dinov1':
-    #     trans = DinoV1Augmentation(cfgs)
+    if cfgs.NET.NAME == 'dinov1':
+        trans = DinoV1Augmentation(cfgs)
 
     trans = transforms.Compose([  
         transforms.ToTensor()])

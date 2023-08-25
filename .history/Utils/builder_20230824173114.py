@@ -4,7 +4,7 @@
 import sys
 sys.path.append('./')
 import torch
-# from Networks import *
+from Networks import *
 from Utils.loss import *
 import torchvision.transforms as transforms
 import numpy as np
@@ -222,21 +222,21 @@ def build_schedulers(cfg):
 
 
 def build_transform(cfgs, is_aug):
-    # if cfgs.NET.NAME == 'dinov1':
-    #     trans = DinoV1Augmentation(cfgs)
+    if cfgs.NET.NAME == 'dinov1':
+        trans = DinoV1Augmentation(cfgs)
 
-    trans = transforms.Compose([  
-        transforms.ToTensor()])
-    if is_aug:
-        trans.append(transforms.RandomHorizontalFlip())
-        trans.append(transforms.RandomVerticalFlip())
-        trans.append(transforms.RandomResizedCrop(size=cfgs.AUG.CROP_SIZE, 
-                                      scale=(cfgs.AUG.CROP_PER, 1), 
-                                      ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)))
-        trans.append(transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, 
-                                contrast=cfgs.AUG.CONTRAST, 
-                                saturation=cfgs.AUG.SATURATION, 
-                                hue=cfgs.AUG.HUE))
+    # trans = transforms.Compose([  
+    #     transforms.ToTensor()])
+    # if is_aug:
+    #     trans.append(transforms.RandomHorizontalFlip())
+    #     trans.append(transforms.RandomVerticalFlip())
+    #     trans.append(transforms.RandomResizedCrop(size=cfgs.AUG.CROP_SIZE, 
+    #                                   scale=(cfgs.AUG.CROP_PER, 1), 
+    #                                   ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)))
+    #     trans.append(transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, 
+    #                             contrast=cfgs.AUG.CONTRAST, 
+    #                             saturation=cfgs.AUG.SATURATION, 
+    #                             hue=cfgs.AUG.HUE))
     return trans
 
 

@@ -90,13 +90,13 @@ def aug_test(cfgs):
     img = dataset1[rint].numpy().transpose((1, 2, 0))           # 因为要做增强，所以要先转numpy
     trans = transforms.Compose([    # 输入:rgbn... hwc uint8 ndarry -> rgbn... chw float32 tensor
         transforms.ToTensor(),
-        transforms.RandomHorizontalFlip(),  # 随机水平反转
-        transforms.RandomVerticalFlip(),    # 随机垂直反转
-        transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
-                                     ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
-        transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
-                               saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE),
-        HazeSimulation()
+        # transforms.RandomHorizontalFlip(),  # 随机水平反转
+        # transforms.RandomVerticalFlip(),    # 随机垂直反转
+        # transforms.RandomResizedCrop(size=(cfgs.AUG.CROP_SIZE, cfgs.AUG.CROP_SIZE), scale=(cfgs.AUG.CROP_PER, 1), 
+        #                              ratio=(1 - cfgs.AUG.RESIZE_RATIO, 1 + cfgs.AUG.RESIZE_RATIO)),
+        # transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
+        #                        saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE),
+        HazeSimulation(p=0.5, t=(0.5, 0.7))
                                ])
     show_augs(img, trans, num_rows, num_cols)
 
