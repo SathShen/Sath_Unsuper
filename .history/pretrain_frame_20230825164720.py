@@ -40,7 +40,7 @@ class PretrainFrame():
         self.teacher_temp_scheduler,
         self.last_layer_lr_scheduler) = build_schedulers(cfgs)
 
-        # FIXME: fp16 and clip_grad
+        # FIXME: fp16
         # if fp16_scaler is not None:
         #     if cfg.optim.clip_grad:
         #         fp16_scaler.unscale_(optimizer)

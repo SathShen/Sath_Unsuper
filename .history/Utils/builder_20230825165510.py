@@ -223,7 +223,7 @@ def build_schedulers(cfg):
 
 def build_transform(cfgs, is_aug):
     if cfgs.NET.NAME == 'dinov1':
-        trans = DinoV1Augmentation(cfgs)
+        trans = DinoV1Augmentation(cfgs.AUG.GLOBAL_SCALE, cfgs.AUG.NUM_LOCAL, cfgs.AUG.LOCAL_SCALE)
 
     # trans = transforms.Compose([  
     #     transforms.ToTensor()])

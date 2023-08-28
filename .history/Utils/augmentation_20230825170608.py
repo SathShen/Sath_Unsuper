@@ -28,7 +28,7 @@ class HazeSimulation(object):
 
 class DinoV1Augmentation(object):
     def __init__(self, cfgs):
-        color_jitter = transforms.RandomApply(torch.nn.ModuleList([transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1)]), p=0.8)
+        color_jitter
         flip_and_color_jitter = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomApply(

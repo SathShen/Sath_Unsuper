@@ -7,7 +7,7 @@ class DinoV2(nn.Module):
     def __init__(self):
         super(DinoV2, self).__init__()
         
-        self.head = DINOHead(embed_dim, args.out_dim, use_bn=args.use_bn_in_head, norm_last_layer=args.norm_last_layer)
+        self.head = 
         self.student = nn.Sequential(
             
         )

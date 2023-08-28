@@ -5,8 +5,7 @@ import random
 
 
 class HazeSimulation(object):
-    def __init__(self, p=0.2, t=(0.3, 0.7)):
-        self.p = p
+    def __init__(self, t=(0.3, 0.7)):
         if isinstance(t, tuple) and len(t) == 2:
             self.tm = t
         elif isinstance(t, float):
@@ -15,8 +14,6 @@ class HazeSimulation(object):
             raise TypeError('t should be float or tuple with length 2')
 
     def __call__(self, img):
-        if random.random() > self.p:
-            return img
         trans_ratio = random.uniform(*self.tm)
         self.transmition_map = torch.full(img.shape, trans_ratio)
         num_pixels = img.shape[-2] * img.shape[-1]
@@ -28,7 +25,8 @@ class HazeSimulation(object):
 
 class DinoV1Augmentation(object):
     def __init__(self, cfgs):
-        color_jitter = transforms.RandomApply(torch.nn.ModuleList([transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1)]), p=0.8)
+        color_jitter = transforms.RandomApply([transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1)],p=0.8)
+        haze_simulation = transforms.RandomApply([HazeSimulation()], p=0.2)
         flip_and_color_jitter = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomApply(
