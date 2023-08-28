@@ -93,15 +93,15 @@ class DinoV1Augmentation(object):
             flips,
             color_jitter,
             hazesimu,
-            cutout
+            cutout,
         ])
         # second global crop
         self.global_transfo2 = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.RandomResizedCrop(cfgs.AUG.CROP_SIZ, scale=cfgs.AUG.GLOBAL_SCALE, interpolation=Image.BICUBIC),
-            flips,
-            color_jitter,
-            hazesimu
+            transforms.RandomResizedCrop(224, scale=global_crops_scale, interpolation=Image.BICUBIC),
+            flip_and_color_jitter,
+            utils.GaussianBlur(0.1),
+            utils.Solarization(0.2),
+            normalize,
         ])
         # transformation for the local small crops
         self.local_crops_number = local_crops_number

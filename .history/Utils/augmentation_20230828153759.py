@@ -79,13 +79,12 @@ class Cutout(object):
 class DinoV1Augmentation(object):
     def __init__(self, cfgs):
         color_jitter = transforms.RandomApply(torch.nn.ModuleList([
-            transforms.ColorJitter(brightness=cfgs.AUG.INTENSITY, contrast=cfgs.AUG.CONTRAST,
-                                   saturation=cfgs.AUG.SATURATION, hue=cfgs.AUG.HUE)]), p=0.8)
+            transforms.ColorJitter(brightness=cfg.AUG.INTENSITY, contrast=cfg.AUG.CONTRAST, saturation=cfg.AUG.SATURATION, hue=cfg.AUG.HUE)]), p=0.8)
         flips = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5),
                                     transforms.RandomVerticalFlip(p=0.5)])
         hazesimu = HazeSimulation(p=0.2, t=(0.3, 0.7))
         cutout = Cutout(p=0.2, scale=(0.1, 0.4), ratio=(3./5, 5./3))
-
+        
         # first global crop
         self.global_transfo1 = transforms.Compose([
             transforms.ToTensor(),
@@ -93,15 +92,15 @@ class DinoV1Augmentation(object):
             flips,
             color_jitter,
             hazesimu,
-            cutout
+            cutout,
         ])
         # second global crop
         self.global_transfo2 = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.RandomResizedCrop(cfgs.AUG.CROP_SIZ, scale=cfgs.AUG.GLOBAL_SCALE, interpolation=Image.BICUBIC),
-            flips,
-            color_jitter,
-            hazesimu
+            transforms.RandomResizedCrop(224, scale=global_crops_scale, interpolation=Image.BICUBIC),
+            flip_and_color_jitter,
+            utils.GaussianBlur(0.1),
+            utils.Solarization(0.2),
+            normalize,
         ])
         # transformation for the local small crops
         self.local_crops_number = local_crops_number
