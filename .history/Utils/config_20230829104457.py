@@ -95,7 +95,6 @@ base_cfg.NET.DROP_RATE = 0.0
 # Drop path rate
 base_cfg.NET.DROP_PATH_RATE = 0.1
 base_cfg.NET.PATCH_SIZE = 16
-base_cfg.NET.EMBED_DIM = 192
 base_cfg.NET.OUT_DIM = 65536
 
 
@@ -103,6 +102,7 @@ base_cfg.NET.OUT_DIM = 65536
 # img_size要被patch_size整除, 除出来的patch_solution要被window_size整除
 base_cfg.NET.SWIN = CN()
 base_cfg.NET.SWIN.IN_CHANS = 3                  # num of input channel
+base_cfg.NET.SWIN.EMBED_DIM = 96                # embedding dimension
 base_cfg.NET.SWIN.DEPTHS = [2, 2, 6, 2]         # num of blocks in stages
 base_cfg.NET.SWIN.NUM_HEADS = [3, 6, 12, 24]    # multi-heads
 base_cfg.NET.SWIN.WINDOW_SIZE = 7               # size of window
@@ -382,11 +382,8 @@ def update_config(config, args):
         config.NET.DROP_PATH_RATE = args.net_dropout_path_rate
     if _check_args('net_patch_size'):
         config.NET.PATCH_SIZE = args.net_patch_size
-    if _check_args('net_embed_dim'):
-        config.NET.EMBED_DIM = args.net_embed_dim
     if _check_args('net_out_dim'):
         config.NET.OUT_DIM = args.net_out_dim
-    
 
      # swin
     if _check_args('net_swin_in_chans'):
