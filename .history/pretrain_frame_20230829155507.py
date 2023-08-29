@@ -89,21 +89,23 @@ class PretrainFrame():
         else:
             loss.backward()
 
-        # clip gradient and update parameters
+        # clip gradient and update optimizer
         if self.fp16_scaler is not None:
             if self.clip_grad:
                 self.fp16_scaler.unscale_(self.optimizer)  # unscale the gradients of optimizer's assigned params in-place
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.fp16_scaler.step(self.optimizer)
-            self.fp16_scaler.update()
+                for v in self.student.values():
+                    v.clip_grad_norm_(cfg.optim.clip_grad)
+            fp16_scaler.step(optimizer)
+            fp16_scaler.update()
         else:
-            if self.clip_grad:
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.optimizer.step()
+            if cfg.optim.clip_grad:
+                for v in model.student.values():
+                    v.clip_grad_norm_(cfg.optim.clip_grad)
+            optimizer.step()
 
-        # check if loss is valid
+        self.fp16_scaler.step(self.optimizer)
+        self.fp16_scaler.update()
+
         if not math.isfinite(loss.item()):
             print(f"Loss is {loss.item()}, stopping training", force=True)
             sys.exit(1)

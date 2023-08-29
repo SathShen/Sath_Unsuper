@@ -18,8 +18,7 @@ class Logger():
     def flush(self):
         self.log.flush()
 
-    def save_log(self, save_dir):
-        save_path = f"{save_dir}/{self.log_path.split('/')[-1]}"
+    def save_log(self, save_path):
         shutil.copy(self.log_path, save_path)
 
     def __del__(self):

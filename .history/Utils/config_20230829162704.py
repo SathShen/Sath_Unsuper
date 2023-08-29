@@ -23,7 +23,6 @@ base_cfg.IS_CMD = False
 base_cfg.CFG_PATH = None
 base_cfg.CFG_NOTE = 'default'
 base_cfg.PRETRAIN_PATH = None
-base_cfg.OUTPUT_PATH = None
 
 base_cfg.DEVICE_IDS = [0]
 base_cfg.IS_FP16 = False
@@ -38,7 +37,9 @@ base_cfg.IS_SAVE_PRED = False
 
 # no need to set
 base_cfg.START_EPOCH = 0
+base_cfg.CFG_DIR = './Configs'
 base_cfg.LOG_DIR = './Logs'
+base_cfg.OUTPUT = './Configs'
 # -----------------------------------------------------------------------------
 # Data settings
 # -----------------------------------------------------------------------------
@@ -308,7 +309,7 @@ def update_config(config, args):
             config.NET.TYPE = get_net_type(config.NET.NAME)
     # parser.add_argument('--output_path', '-op', type=str, help='output dir to save log, model, cfg...')
     if _check_args('output_path'):
-        config.OUTPUT_PATH = args.output_path
+        config.OUTPUT = args.output_path
 
     # train setting
     if _check_args('device_ids'):
@@ -522,8 +523,7 @@ def update_config(config, args):
         config.TT_SCHEDULER.T_MULT = args.tts_T_mult
 
     # output folder
-    if config.OUTPUT_PATH is None:
-        config.OUTPUT_PATH = os.path.join(config.DATA.TRAIN_DATA_PATH, f'/{config.NET.NAME}_output')
+    config.OUTPUT = os.path.join(config.CFG_DIR, config.NET.NAME)
     config.freeze()
 
 
@@ -538,12 +538,12 @@ def get_config(args):
 
 
 def save_config(config):
-    if not os.path.exists(config.OUTPUT_PATH):
-        os.makedirs(config.OUTPUT_PATH)
+    if not os.path.exists(config.OUTPUT):
+        os.makedirs(config.OUTPUT)
     if config.IS_EVAL:
-        path = f"{config.OUTPUT_PATH}/{config.NET.NAME}_eval_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
+        path = f"{config.OUTPUT}/{config.NET.NAME}_eval_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
     else:  
-        path = f"{config.OUTPUT_PATH}/{config.NET.NAME}_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
+        path = f"{config.OUTPUT}/{config.NET.NAME}_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
     with open(path, "w") as f:
         f.write(config.dump())
 

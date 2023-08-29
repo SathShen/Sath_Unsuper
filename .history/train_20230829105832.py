@@ -52,7 +52,6 @@ def train(cfg, frame, train_dataset):
     logger.log_in(f'train_time: {epoch_timer.get_sumtime()}, '
                   f'{train_dataset.__len__() * (cfg.TRAIN.NUM_EPOCHS - cfg.TRAIN.START_EPOCH) / epoch_timer.sum():.2f}examples/sec, '
                   f'total_time: {total_timer.get_sumtime()}, best_loss: {best_loss:.3f}', 'Finish!')
-    logger.save_log(f'{cfg.OUT_PATH}/config')
 
 def get_parserargs():
     parser = argparse.ArgumentParser(description='Train the network on images using Pytorch')
@@ -63,7 +62,6 @@ def get_parserargs():
     parser.add_argument('--cfg_path', '-cfg', type=str, default=None, metavar="CFG", help='path to load a local config file')
     parser.add_argument('--cfg_note', '-cn', metavar='CN', type=str, help='note which will be saved in config name')
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')
-    parser.add_argument('--output_path', '-op', type=str, help='output dir to save log, model, cfg...')
 
     # train setting
     parser.add_argument('--device_ids', '-d', metavar='D', type=int, nargs='+', help='device ids which is training on, first is the major')
@@ -108,9 +106,9 @@ def get_parserargs():
     parser.add_argument('--net_dropout_path_rate', '-ndpr', metavar='NDPR', type=float, help='stochastic depth dropout path rate')
     parser.add_argument('--net_patch_size', '-nps', metavar='NPS', default=16, type=int, help="""Using smaller values leads to better performance but requires more memory. 
                         If <16, we recommend disabling mixed precision training (--use_fp16 false) to avoid unstabilities.""")
+    #   config.NET.EMBED_DIM = args.net_embed_dim
     parser.add_argument('--net_embed_dim', '-ned', default=192, type=int, help='Embed dim')
     parser.add_argument('--net_out_dim', '-nod',default=65536, type=int, help="""Output dim. For complex and large datasets large values (like 65k) work well.""")
-    parser.add_argument('--net_num_heads', '-nnh', default=3, type=int, help='Number of attention heads')
     # swin
     parser.add_argument('--net_swin_in_chans', '-nsuic', metavar='NSUIC', type=int, help='in channels of swin')
     parser.add_argument('--net_swin_embed_dim', '-nsued', metavar='NSUED', type=int, help='embed dim of swin')
@@ -185,8 +183,6 @@ def init_args(args):
     args.cfg_note = 'GIDwater'
     # args.pretrain_path = r'F:\Test_data\BJ\train\dlinknet34_ep6_train_077.params'
     args.pretrain_path = None
-    args.output_path = r'F:\Test_data\GID_water\train'
-
     args.device_ids = [0]
     args.is_eval = False
 

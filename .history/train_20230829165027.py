@@ -185,8 +185,6 @@ def init_args(args):
     args.cfg_note = 'GIDwater'
     # args.pretrain_path = r'F:\Test_data\BJ\train\dlinknet34_ep6_train_077.params'
     args.pretrain_path = None
-    args.output_path = r'F:\Test_data\GID_water\train'
-
     args.device_ids = [0]
     args.is_eval = False
 

@@ -1,6 +1,6 @@
 import time
 import os
-import shutil
+
 log_path = r'./Logs'
 
 
@@ -18,9 +18,6 @@ class Logger():
     def flush(self):
         self.log.flush()
 
-    def save_log(self, save_dir):
-        save_path = f"{save_dir}/{self.log_path.split('/')[-1]}"
-        shutil.copy(self.log_path, save_path)
-
     def __del__(self):
+
         self.log.close()

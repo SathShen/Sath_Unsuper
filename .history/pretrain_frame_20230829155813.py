@@ -103,7 +103,9 @@ class PretrainFrame():
                     v.clip_grad_norm_(self.clip_grad)
             self.optimizer.step()
 
-        # check if loss is valid
+        self.fp16_scaler.step(self.optimizer)
+        self.fp16_scaler.update()
+
         if not math.isfinite(loss.item()):
             print(f"Loss is {loss.item()}, stopping training", force=True)
             sys.exit(1)

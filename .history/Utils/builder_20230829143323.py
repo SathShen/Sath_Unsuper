@@ -75,61 +75,61 @@ class CosineScheduler(object):
         return iters, T_is
 
 
-def build_net(cfg):
-    net_type = cfg.NET.TYPE
-    net_name = cfg.NET.NAME
+def build_net(config):
+    net_type = config.NET.TYPE
+    net_name = config.NET.NAME
 
     if net_type == 'dino':
         if net_name == 'dinov2':
-            net = DinoV2(cfg);
+            net = DinoV2(config);
         elif net_name == 'dinov1':
-            net = DinoV1(cfg);
+            net = DinoV1(config);
     if net_type == 'simmim':
         if net_name == 'simmim':
-            encoder = SwinTransformerForSimMIM(img_size=cfg.AUG.CROP_SIZE,
-                                            patch_size=cfg.NET.SWIN.PATCH_SIZE,
-                                            in_chans=cfg.NET.SWIN.IN_CHANS,
+            encoder = SwinTransformerForSimMIM(img_size=config.AUG.CROP_SIZE,
+                                            patch_size=config.NET.SWIN.PATCH_SIZE,
+                                            in_chans=config.NET.SWIN.IN_CHANS,
                                             num_classes=0,
-                                            embed_dim=cfg.NET.SWIN.EMBED_DIM,
-                                            depths=cfg.NET.SWIN.DEPTHS,
-                                            num_heads=cfg.NET.SWIN.NUM_HEADS,
-                                            window_size=cfg.NET.SWIN.WINDOW_SIZE,
-                                            mlp_ratio=cfg.NET.SWIN.MLP_RATIO,
-                                            qkv_bias=cfg.NET.SWIN.QKV_BIAS,
-                                            qk_scale=cfg.NET.SWIN.QK_SCALE,
-                                            drop_rate=cfg.NET.DROP_RATE,
-                                            drop_path_rate=cfg.NET.DROP_PATH_RATE,
-                                            ape=cfg.NET.SWIN.APE,
-                                            patch_norm=cfg.NET.SWIN.PATCH_NORM,
-                                            use_checkpoint=cfg.TRAIN.USE_CHECKPOINT)
+                                            embed_dim=config.NET.SWIN.EMBED_DIM,
+                                            depths=config.NET.SWIN.DEPTHS,
+                                            num_heads=config.NET.SWIN.NUM_HEADS,
+                                            window_size=config.NET.SWIN.WINDOW_SIZE,
+                                            mlp_ratio=config.NET.SWIN.MLP_RATIO,
+                                            qkv_bias=config.NET.SWIN.QKV_BIAS,
+                                            qk_scale=config.NET.SWIN.QK_SCALE,
+                                            drop_rate=config.NET.DROP_RATE,
+                                            drop_path_rate=config.NET.DROP_PATH_RATE,
+                                            ape=config.NET.SWIN.APE,
+                                            patch_norm=config.NET.SWIN.PATCH_NORM,
+                                            use_checkpoint=config.TRAIN.USE_CHECKPOINT)
             encoder_stride = 32
-            in_chans = cfg.NET.SWIN.IN_CHANS
-            patch_size = cfg.NET.SWIN.PATCH_SIZE
-            net = SimMIM(config=cfg.NET.SIMMIM,
+            in_chans = config.NET.SWIN.IN_CHANS
+            patch_size = config.NET.SWIN.PATCH_SIZE
+            net = SimMIM(config=config.NET.SIMMIM,
                          encoder=encoder, 
                          encoder_stride=encoder_stride, 
                          in_chans=in_chans, 
                          patch_size=patch_size)
         elif net_name == 'simmimv2':
-            encoder = SwinTransformerV2ForSimMIM(img_size=cfg.AUG.CROP_SIZE,
-                                                patch_size=cfg.NET.SWINV2.PATCH_SIZE,
-                                                in_chans=cfg.NET.SWINV2.IN_CHANS,
+            encoder = SwinTransformerV2ForSimMIM(img_size=config.AUG.CROP_SIZE,
+                                                patch_size=config.NET.SWINV2.PATCH_SIZE,
+                                                in_chans=config.NET.SWINV2.IN_CHANS,
                                                 num_classes=0,
-                                                embed_dim=cfg.NET.SWINV2.EMBED_DIM,
-                                                depths=cfg.NET.SWINV2.DEPTHS,
-                                                num_heads=cfg.NET.SWINV2.NUM_HEADS,
-                                                window_size=cfg.NET.SWINV2.WINDOW_SIZE,
-                                                mlp_ratio=cfg.NET.SWINV2.MLP_RATIO,
-                                                qkv_bias=cfg.NET.SWINV2.QKV_BIAS,
-                                                drop_rate=cfg.NET.DROP_RATE,
-                                                drop_path_rate=cfg.NET.DROP_PATH_RATE,
-                                                ape=cfg.NET.SWINV2.APE,
-                                                patch_norm=cfg.NET.SWINV2.PATCH_NORM,
-                                                use_checkpoint=cfg.TRAIN.USE_CHECKPOINT)
+                                                embed_dim=config.NET.SWINV2.EMBED_DIM,
+                                                depths=config.NET.SWINV2.DEPTHS,
+                                                num_heads=config.NET.SWINV2.NUM_HEADS,
+                                                window_size=config.NET.SWINV2.WINDOW_SIZE,
+                                                mlp_ratio=config.NET.SWINV2.MLP_RATIO,
+                                                qkv_bias=config.NET.SWINV2.QKV_BIAS,
+                                                drop_rate=config.NET.DROP_RATE,
+                                                drop_path_rate=config.NET.DROP_PATH_RATE,
+                                                ape=config.NET.SWINV2.APE,
+                                                patch_norm=config.NET.SWINV2.PATCH_NORM,
+                                                use_checkpoint=config.TRAIN.USE_CHECKPOINT)
             encoder_stride = 32
-            in_chans = cfg.NET.SWINV2.IN_CHANS
-            patch_size = cfg.NET.SWINV2.PATCH_SIZE
-            net = SimMIM(config=cfg.NET.SIMMIM,
+            in_chans = config.NET.SWINV2.IN_CHANS
+            patch_size = config.NET.SWINV2.PATCH_SIZE
+            net = SimMIM(config=config.NET.SIMMIM,
                          encoder=encoder, 
                          encoder_stride=encoder_stride, 
                          in_chans=in_chans, 
@@ -139,44 +139,41 @@ def build_net(cfg):
     return net
 
 
-def build_loss(cfg):
-    if cfg.TRAIN.LOSS.NAME == 'dinov1':
-        loss_func = DinoV1Loss(size_average=cfg.TRAIN.LOSS.IS_AVERAGE, 
-                               ignore_index=cfg.TRAIN.LOSS.IGNORE_INDEX)
-    elif cfg.TRAIN.LOSS.NAME == 'dinov2':
-        loss_func = DinoV2Loss(size_average=cfg.TRAIN.LOSS.IS_AVERAGE, 
-                               ignore_index=cfg.TRAIN.LOSS.IGNORE_INDEX)
+def build_loss(config):
+    if config.TRAIN.LOSS.NAME == 'dinov2':
+        loss_func = DinoV2Loss(size_average=config.TRAIN.LOSS.IS_AVERAGE, 
+                               ignore_index=config.TRAIN.LOSS.IGNORE_INDEX)
     else:
-        raise NotImplementedError(f"Unkown loss: {cfg.TRAIN.LOSS.NAME}")
+        raise NotImplementedError(f"Unkown loss: {config.TRAIN.LOSS.NAME}")
     return loss_func
 
 
-def build_optimizer(cfg, net):
-    if cfg.TRAIN.OPTIMIZER.NAME == 'adam':
-        optimizer = torch.optim.Adam([{'params': net.parameters(), 'initial_lr': cfg.TRAIN.LEARNING_RATE}], 
-                                     lr=cfg.TRAIN.LEARNING_RATE, 
-                                     betas=cfg.TRAIN.OPTIMIZER.BETAS, 
-                                     weight_decay=cfg.TRAIN.OPTIMIZER.WEIGHT_DECAY, 
-                                     eps=cfg.TRAIN.OPTIMIZER.EPS)
-    elif cfg.TRAIN.OPTIMIZER.NAME == 'sgd':
-        optimizer = torch.optim.SGD([{'params': net.parameters(), 'initial_lr': cfg.TRAIN.LEARNING_RATE}], 
-                                     lr=cfg.TRAIN.LEARNING_RATE, 
-                                     weight_decay=cfg.TRAIN.OPTIMIZER.WEIGHT_DECAY,
-                                     momentum=cfg.TRAIN.OPTIMIZER.MOMENTUM)
-    elif cfg.TRAIN.OPTIMIZER.NAME == 'adamw':
-        optimizer = torch.optim.AdamW([{'params': net.parameters(), 'initial_lr': cfg.TRAIN.LEARNING_RATE}], 
-                                      lr=cfg.TRAIN.LEARNING_RATE, 
-                                      betas=cfg.TRAIN.OPTIMIZER.BETAS, 
-                                      weight_decay=cfg.TRAIN.OPTIMIZER.WEIGHT_DECAY,
-                                      eps=cfg.TRAIN.OPTIMIZER.EPS)
-    elif cfg.TRAIN.OPTIMIZER.NAME == 'rmsprop':
-        optimizer = torch.optim.RMSprop([{'params': net.parameters(), 'initial_lr': cfg.TRAIN.LEARNING_RATE}], 
-                                        lr=cfg.TRAIN.LEARNING_RATE, 
-                                        momentum=cfg.TRAIN.OPTIMIZER.MOMENTUM, 
-                                        weight_decay=cfg.TRAIN.OPTIMIZER.WEIGHT_DECAY,
-                                        eps=cfg.TRAIN.OPTIMIZER.EPS)
+def build_optimizer(config, net):
+    if config.TRAIN.OPTIMIZER.NAME == 'adam':
+        optimizer = torch.optim.Adam([{'params': net.parameters(), 'initial_lr': config.TRAIN.LEARNING_RATE}], 
+                                     lr=config.TRAIN.LEARNING_RATE, 
+                                     betas=config.TRAIN.OPTIMIZER.BETAS, 
+                                     weight_decay=config.TRAIN.OPTIMIZER.WEIGHT_DECAY, 
+                                     eps=config.TRAIN.OPTIMIZER.EPS)
+    elif config.TRAIN.OPTIMIZER.NAME == 'sgd':
+        optimizer = torch.optim.SGD([{'params': net.parameters(), 'initial_lr': config.TRAIN.LEARNING_RATE}], 
+                                     lr=config.TRAIN.LEARNING_RATE, 
+                                     weight_decay=config.TRAIN.OPTIMIZER.WEIGHT_DECAY,
+                                     momentum=config.TRAIN.OPTIMIZER.MOMENTUM)
+    elif config.TRAIN.OPTIMIZER.NAME == 'adamw':
+        optimizer = torch.optim.AdamW([{'params': net.parameters(), 'initial_lr': config.TRAIN.LEARNING_RATE}], 
+                                      lr=config.TRAIN.LEARNING_RATE, 
+                                      betas=config.TRAIN.OPTIMIZER.BETAS, 
+                                      weight_decay=config.TRAIN.OPTIMIZER.WEIGHT_DECAY,
+                                      eps=config.TRAIN.OPTIMIZER.EPS)
+    elif config.TRAIN.OPTIMIZER.NAME == 'rmsprop':
+        optimizer = torch.optim.RMSprop([{'params': net.parameters(), 'initial_lr': config.TRAIN.LEARNING_RATE}], 
+                                        lr=config.TRAIN.LEARNING_RATE, 
+                                        momentum=config.TRAIN.OPTIMIZER.MOMENTUM, 
+                                        weight_decay=config.TRAIN.OPTIMIZER.WEIGHT_DECAY,
+                                        eps=config.TRAIN.OPTIMIZER.EPS)
     else:
-        raise NotImplementedError(f"Unkown optimizer: {cfg.TRAIN.OPTIMIZER.NAME}")
+        raise NotImplementedError(f"Unkown optimizer: {config.TRAIN.OPTIMIZER.NAME}")
     return optimizer
 
 

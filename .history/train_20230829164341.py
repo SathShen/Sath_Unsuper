@@ -52,7 +52,6 @@ def train(cfg, frame, train_dataset):
     logger.log_in(f'train_time: {epoch_timer.get_sumtime()}, '
                   f'{train_dataset.__len__() * (cfg.TRAIN.NUM_EPOCHS - cfg.TRAIN.START_EPOCH) / epoch_timer.sum():.2f}examples/sec, '
                   f'total_time: {total_timer.get_sumtime()}, best_loss: {best_loss:.3f}', 'Finish!')
-    logger.save_log(f'{cfg.OUT_PATH}/config')
 
 def get_parserargs():
     parser = argparse.ArgumentParser(description='Train the network on images using Pytorch')
@@ -185,8 +184,6 @@ def init_args(args):
     args.cfg_note = 'GIDwater'
     # args.pretrain_path = r'F:\Test_data\BJ\train\dlinknet34_ep6_train_077.params'
     args.pretrain_path = None
-    args.output_path = r'F:\Test_data\GID_water\train'
-
     args.device_ids = [0]
     args.is_eval = False
 

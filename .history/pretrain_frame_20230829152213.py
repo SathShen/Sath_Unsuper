@@ -16,7 +16,7 @@ class PretrainFrame():
         self.num_iter_per_epoch = num_dataset // cfg.DATA.BATCH_SIZE + 1  # 训练一个batch即一个iter
         self.start_iter = cfg.START_EPOCH * self.num_iter_per_epoch
 
-        self.clip_grad = cfg.CLIP_GRAD
+        self.clip
         self.lr = cfg.TRAIN.LEARNING_RATE
 
         self.net = build_net(cfg)
@@ -78,32 +78,28 @@ class PretrainFrame():
         last_layer_lr = self.last_layer_lr_scheduler[it]
         self.apply_optim_scheduler(self.optimizer, lr, wd, last_layer_lr)
 
-        # forward and backward
         teacher_temp = self.teacher_temp_scheduler[it]
         self.optimizer.zero_grad()
         with autocast():
             student_output, teacher_output = self.net(self.crops_list)   # pred: batch_size, num_classes, H, W
             loss = self.loss_fuc(student_output, teacher_output, teacher_temp)
-        if self.fp16_scaler is not None:
-            self.fp16_scaler.scale(loss).backward()
-        else:
-            loss.backward()
 
-        # clip gradient and update parameters
         if self.fp16_scaler is not None:
-            if self.clip_grad:
-                self.fp16_scaler.unscale_(self.optimizer)  # unscale the gradients of optimizer's assigned params in-place
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.fp16_scaler.step(self.optimizer)
-            self.fp16_scaler.update()
+            if cfg.CLIP_GRAD:
+                self.fp16_scaler.unscale_(optimizer)
+                for v in model.student.values():
+                    v.clip_grad_norm_(cfg.optim.clip_grad)
+            fp16_scaler.step(optimizer)
+            fp16_scaler.update()
         else:
-            if self.clip_grad:
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.optimizer.step()
+            if cfg.optim.clip_grad:
+                for v in model.student.values():
+                    v.clip_grad_norm_(cfg.optim.clip_grad)
+            optimizer.step()
+        self.fp16_scaler.scale(loss).backward()
+        self.fp16_scaler.step(self.optimizer)
+        self.fp16_scaler.update()
 
-        # check if loss is valid
         if not math.isfinite(loss.item()):
             print(f"Loss is {loss.item()}, stopping training", force=True)
             sys.exit(1)

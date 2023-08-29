@@ -1,6 +1,4 @@
 import os
-import sys
-import math
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -16,7 +14,7 @@ class PretrainFrame():
         self.num_iter_per_epoch = num_dataset // cfg.DATA.BATCH_SIZE + 1  # 训练一个batch即一个iter
         self.start_iter = cfg.START_EPOCH * self.num_iter_per_epoch
 
-        self.clip_grad = cfg.CLIP_GRAD
+        self.class_list = cfg.DATA.CLASS_LIST
         self.lr = cfg.TRAIN.LEARNING_RATE
 
         self.net = build_net(cfg)
@@ -44,11 +42,22 @@ class PretrainFrame():
         self.momentum_scheduler,
         self.teacher_temp_scheduler,
         self.last_layer_lr_scheduler) = build_schedulers(cfg)
-            
-        if cfg.IS_FP16:
-            self.fp16_scaler = GradScaler()
-        else:
-            self.fp16_scaler = None
+
+        # FIXME: fp16 and clip_grad
+        # if fp16_scaler is not None:
+        #     if cfg.optim.clip_grad:
+        #         fp16_scaler.unscale_(optimizer)
+        #         for v in model.student.values():
+        #             v.clip_grad_norm_(cfg.optim.clip_grad)
+        #     fp16_scaler.step(optimizer)
+        #     fp16_scaler.update()
+        # else:
+        #     if cfg.optim.clip_grad:
+        #         for v in model.student.values():
+        #             v.clip_grad_norm_(cfg.optim.clip_grad)
+        #     optimizer.step()
+
+        self.fp16_scaler = GradScaler()
 
         if cfg.NET.PRETRAIN_PATH:
             self.load_weights(cfg.NET.PRETRAIN_PATH)
@@ -70,7 +79,7 @@ class PretrainFrame():
         self.crops_list = crops_list
 
     def optimize(self, it):
-        self.crops_list = Variable(self.crops_list.to(self.mdevice), volatile=False)
+        self.imgs = Variable(self.imgs.to(self.mdevice), volatile=False)
 
         # apply schedules
         lr = self.lr_scheduler[it]
@@ -78,35 +87,14 @@ class PretrainFrame():
         last_layer_lr = self.last_layer_lr_scheduler[it]
         self.apply_optim_scheduler(self.optimizer, lr, wd, last_layer_lr)
 
-        # forward and backward
         teacher_temp = self.teacher_temp_scheduler[it]
         self.optimizer.zero_grad()
         with autocast():
-            student_output, teacher_output = self.net(self.crops_list)   # pred: batch_size, num_classes, H, W
-            loss = self.loss_fuc(student_output, teacher_output, teacher_temp)
-        if self.fp16_scaler is not None:
-            self.fp16_scaler.scale(loss).backward()
-        else:
-            loss.backward()
-
-        # clip gradient and update parameters
-        if self.fp16_scaler is not None:
-            if self.clip_grad:
-                self.fp16_scaler.unscale_(self.optimizer)  # unscale the gradients of optimizer's assigned params in-place
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.fp16_scaler.step(self.optimizer)
-            self.fp16_scaler.update()
-        else:
-            if self.clip_grad:
-                for v in self.net.student.values():
-                    v.clip_grad_norm_(self.clip_grad)
-            self.optimizer.step()
-
-        # check if loss is valid
-        if not math.isfinite(loss.item()):
-            print(f"Loss is {loss.item()}, stopping training", force=True)
-            sys.exit(1)
+            outputs = self.net(self.imgs)   # pred: batch_size, num_classes, H, W
+            l = self.loss_fuc(*outputs, teacher_temp)
+        self.fp16_scaler.scale(l).backward()
+        self.fp16_scaler.step(self.optimizer)
+        self.fp16_scaler.update()
 
         # EMA update for the teacher
         with torch.no_grad():
@@ -114,7 +102,7 @@ class PretrainFrame():
             for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
                 param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
                 
-        return loss.item()
+        return l.item()
 
     def save_weights(self, train_data_path, net_name, cfg_note, epoch, best_loss):
         """save checkpoint with best loss NOT mIoU
@@ -145,8 +133,8 @@ class PretrainFrame():
         checkpoint = torch.load(weight_path)
         self.student.load_state_dict(checkpoint['model_state_dict'], strict=False)
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        # self.epoch = checkpoint['epoch']
-        # self.loss = checkpoint['loss']
+        self.epoch = checkpoint['epoch']
+        self.loss = checkpoint['loss']
 
 
     def update_lr(self):

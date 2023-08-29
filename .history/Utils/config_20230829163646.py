@@ -538,12 +538,12 @@ def get_config(args):
 
 
 def save_config(config):
-    if not os.path.exists(config.OUTPUT_PATH):
-        os.makedirs(config.OUTPUT_PATH)
+    if not os.path.exists(config.OUTPUT):
+        os.makedirs(config.OUTPUT)
     if config.IS_EVAL:
-        path = f"{config.OUTPUT_PATH}/{config.NET.NAME}_eval_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
+        path = f"{config.OUTPUT}/{config.NET.NAME}_eval_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
     else:  
-        path = f"{config.OUTPUT_PATH}/{config.NET.NAME}_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
+        path = f"{config.OUTPUT}/{config.NET.NAME}_{config.CFG_NOTE}_{time.strftime('%y%m%d')}_{time.strftime('%H%M%S')}.yaml"
     with open(path, "w") as f:
         f.write(config.dump())
 

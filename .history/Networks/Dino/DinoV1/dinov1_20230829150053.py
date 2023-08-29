@@ -37,8 +37,8 @@ class DinoV1(nn.Module):
             p.requires_grad = False
 
     def forward(self, crops_list):
-        s1 = self.student_backbone(crops_list)
-        t1 = self.teacher_backbone(crops_list[:2])
+        s1 = self.student_backbone(crops_list[:2])
+        t1 = self.teacher_backbone(crops_list)
         student_output = self.student_head(s1)
         teacher_output = self.teacher_head(t1)
         return student_output, teacher_output
