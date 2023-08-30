@@ -17,11 +17,7 @@ class PretrainFrame():
         self.start_iter = cfg.START_EPOCH * self.num_iter_per_epoch
 
         self.clip_grad = cfg.CLIP_GRAD
-        self.learning_rate = cfg.LR_SCHEDULER.LEARNING_RATE
-        self.weight_decay = cfg.WD_SCHEDULER.WEIGHT_DECAY
-        self.teacher_momentum = cfg.TM_SCHEDULER.TEACHER_MOMENTUM
-        self.teacher_temperature = cfg.TT_SCHEDULER.TEACHER_TEMP
-        self.last_layer_lr = cfg.LR_SCHEDULER.LEARNING_RATE
+        self.lr = cfg.TRAIN.LEARNING_RATE
 
         self.net = build_net(cfg)
 
@@ -77,17 +73,17 @@ class PretrainFrame():
         self.crops_list = Variable(self.crops_list.to(self.mdevice), volatile=False)
 
         # apply schedules
-        self.learning_rate = self.lr_scheduler[it]
-        self.weight_decay = self.wd_scheduler[it]
-        self.last_layer_lr = self.last_layer_lr_scheduler[it]
-        self.apply_optim_scheduler(self.optimizer, self.learning_rate, self.weight_decay, self.last_layer_lr)
+        lr = self.lr_scheduler[it]
+        wd = self.wd_scheduler[it]
+        last_layer_lr = self.last_layer_lr_scheduler[it]
+        self.apply_optim_scheduler(self.optimizer, lr, wd, last_layer_lr)
 
         # forward and backward
-        self.teacher_temperature = self.teacher_temp_scheduler[it]
+        teacher_temp = self.teacher_temp_scheduler[it]
         self.optimizer.zero_grad()
         with autocast():
             student_output, teacher_output = self.net(self.crops_list)   # pred: batch_size, num_classes, H, W
-            loss = self.loss_fuc(student_output, teacher_output, self.teacher_temperature)
+            loss = self.loss_fuc(student_output, teacher_output, teacher_temp)
         if self.fp16_scaler is not None:
             self.fp16_scaler.scale(loss).backward()
         else:
@@ -114,9 +110,9 @@ class PretrainFrame():
 
         # EMA update for the teacher
         with torch.no_grad():
-            self.teacher_momentum = self.momentum_scheduler[it]  # momentum parameter
+            mom = self.momentum_scheduler[it]  # momentum parameter
             for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
-                param_k.data.mul_(self.teacher_momentum).add_((1 - self.teacher_momentum) * param_q.detach().data)
+                param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
                 
         return loss.item()
 
@@ -148,10 +144,23 @@ class PretrainFrame():
         output_path = output_path + '/autosave'
         if not os.path.exists(output_path):
             os.makedirs(output_path)
-        path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}.params"
-        torch.save({'epoch': epoch,
-                    'model_state_dict': self.student.state_dict(),
-                    'optimizer_state_dict': self.optimizer.state_dict()}, path)
+        best_loss_str = str(best_loss)[2:5]
+        if weight_list:
+            for weight_names in weight_list:
+                namesplits = weight_names.split('_')
+                if namesplits[3][:3] <= best_loss_str:
+                    os.remove(f'{output_path}/{weight_names}')
+                    path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
+                    torch.save({'epoch': epoch,
+                                'model_state_dict': self.student.state_dict(),
+                                'optimizer_state_dict': self.optimizer.state_dict(),
+                                'loss': best_loss}, path)
+        else:
+            path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
+            torch.save({'epoch': epoch,
+                        'model_state_dict': self.student.state_dict(),
+                        'optimizer_state_dict': self.optimizer.state_dict(),
+                        'loss': best_loss}, path)
 
             
     def load_weights(self, weight_path):
@@ -164,4 +173,4 @@ class PretrainFrame():
 
     def update_lr(self):
         self.lr_scheduler.step()
-        self.learning_rate = self.lr_scheduler.get_last_lr()[0]
+        self.lr = self.lr_scheduler.get_last_lr()[0]

@@ -44,8 +44,8 @@ def train(cfg, frame, train_dataset):
         epoch_timer.stop()
         logger.log_in(f'epoch: {epoch}, epoch_time: {epoch_timer.get_epochtime()}, '
                       f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, '
-                      f'lr: {frame.learning_rate:.2e}, wd:{frame.weight_decay:.3f}, '
-                      f'teacher_temp:{frame.teacher_temperature:.3f}, teacher_mom:{frame.teacher_momentum:.3f}')
+                      f'lr: {frame.learning_rate:.2e}, wd:{frame.weight_decay:.2e}, '
+                      f'teacher_temp:{frame.teacher_temperature}')   # FIXME schedulers...wd...momentum...
         logger.flush()
 
     total_timer.stop()

@@ -17,11 +17,10 @@ class PretrainFrame():
         self.start_iter = cfg.START_EPOCH * self.num_iter_per_epoch
 
         self.clip_grad = cfg.CLIP_GRAD
-        self.learning_rate = cfg.LR_SCHEDULER.LEARNING_RATE
-        self.weight_decay = cfg.WD_SCHEDULER.WEIGHT_DECAY
-        self.teacher_momentum = cfg.TM_SCHEDULER.TEACHER_MOMENTUM
-        self.teacher_temperature = cfg.TT_SCHEDULER.TEACHER_TEMP
-        self.last_layer_lr = cfg.LR_SCHEDULER.LEARNING_RATE
+        self.lr = cfg.LR_SCHEDULER.LEARNING_RATE
+        self.wd = cfg.WD_SCHEDULER.WEIGHT_DECAY
+        self.teacher_momentum = cfg.TEACHER_MOMENTUM
+        self.teacher_temp = cfg.TEACHER_TEMP
 
         self.net = build_net(cfg)
 
@@ -77,17 +76,17 @@ class PretrainFrame():
         self.crops_list = Variable(self.crops_list.to(self.mdevice), volatile=False)
 
         # apply schedules
-        self.learning_rate = self.lr_scheduler[it]
-        self.weight_decay = self.wd_scheduler[it]
+        self.lr = self.lr_scheduler[it]
+        self.wd = self.wd_scheduler[it]
         self.last_layer_lr = self.last_layer_lr_scheduler[it]
-        self.apply_optim_scheduler(self.optimizer, self.learning_rate, self.weight_decay, self.last_layer_lr)
+        self.apply_optim_scheduler(self.optimizer, self.lr, self.wd, self.last_layer_lr)
 
         # forward and backward
-        self.teacher_temperature = self.teacher_temp_scheduler[it]
+        teacher_temp = self.teacher_temp_scheduler[it]
         self.optimizer.zero_grad()
         with autocast():
             student_output, teacher_output = self.net(self.crops_list)   # pred: batch_size, num_classes, H, W
-            loss = self.loss_fuc(student_output, teacher_output, self.teacher_temperature)
+            loss = self.loss_fuc(student_output, teacher_output, teacher_temp)
         if self.fp16_scaler is not None:
             self.fp16_scaler.scale(loss).backward()
         else:
@@ -114,9 +113,9 @@ class PretrainFrame():
 
         # EMA update for the teacher
         with torch.no_grad():
-            self.teacher_momentum = self.momentum_scheduler[it]  # momentum parameter
+            mom = self.momentum_scheduler[it]  # momentum parameter
             for param_q, param_k in zip(self.student.module.parameters(), self.teacher.module.parameters()):
-                param_k.data.mul_(self.teacher_momentum).add_((1 - self.teacher_momentum) * param_q.detach().data)
+                param_k.data.mul_(mom).add_((1 - mom) * param_q.detach().data)
                 
         return loss.item()
 
@@ -164,4 +163,4 @@ class PretrainFrame():
 
     def update_lr(self):
         self.lr_scheduler.step()
-        self.learning_rate = self.lr_scheduler.get_last_lr()[0]
+        self.lr = self.lr_scheduler.get_last_lr()[0]

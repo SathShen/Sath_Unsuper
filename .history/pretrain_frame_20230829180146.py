@@ -20,7 +20,7 @@ class PretrainFrame():
         self.learning_rate = cfg.LR_SCHEDULER.LEARNING_RATE
         self.weight_decay = cfg.WD_SCHEDULER.WEIGHT_DECAY
         self.teacher_momentum = cfg.TM_SCHEDULER.TEACHER_MOMENTUM
-        self.teacher_temperature = cfg.TT_SCHEDULER.TEACHER_TEMP
+        self.teacher_temp = cfg.TT_SCHEDULER.TEACHER_TEMP
         self.last_layer_lr = cfg.LR_SCHEDULER.LEARNING_RATE
 
         self.net = build_net(cfg)
@@ -83,11 +83,11 @@ class PretrainFrame():
         self.apply_optim_scheduler(self.optimizer, self.learning_rate, self.weight_decay, self.last_layer_lr)
 
         # forward and backward
-        self.teacher_temperature = self.teacher_temp_scheduler[it]
+        self.teacher_temp = self.teacher_temp_scheduler[it]
         self.optimizer.zero_grad()
         with autocast():
             student_output, teacher_output = self.net(self.crops_list)   # pred: batch_size, num_classes, H, W
-            loss = self.loss_fuc(student_output, teacher_output, self.teacher_temperature)
+            loss = self.loss_fuc(student_output, teacher_output, self.teacher_temp)
         if self.fp16_scaler is not None:
             self.fp16_scaler.scale(loss).backward()
         else:

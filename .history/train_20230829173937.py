@@ -38,14 +38,14 @@ def train(cfg, frame, train_dataset):
             if train_epoch_loss < best_loss:
                 best_loss = train_epoch_loss
                 frame.save_best_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch, train_epoch_loss)
-        if epoch % cfg.SAVE_FREQ == 0:
-            frame.save_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch)
 
+        if epoch == 
         epoch_timer.stop()
         logger.log_in(f'epoch: {epoch}, epoch_time: {epoch_timer.get_epochtime()}, '
                       f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, '
-                      f'lr: {frame.learning_rate:.2e}, wd:{frame.weight_decay:.3f}, '
-                      f'teacher_temp:{frame.teacher_temperature:.3f}, teacher_mom:{frame.teacher_momentum:.3f}')
+                      f'lr: {frame.lr:.2e}, ')   # FIXME schedulers...wd...momentum...
+            
+        frame.update_lr()
         logger.flush()
 
     total_timer.stop()

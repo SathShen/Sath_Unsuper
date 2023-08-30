@@ -31,28 +31,28 @@ def train(cfg, frame, train_dataset):
             it += 1
         train_epoch_loss /= len(train_data_loader_iter)
 
+        # EMA update for the teacher
+
         if epoch == cfg.TRAIN.START_EPOCH:
             best_loss = train_epoch_loss
-            frame.save_best_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch, train_epoch_loss)
+            frame.save_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch, train_epoch_loss)
         else:
             if train_epoch_loss < best_loss:
                 best_loss = train_epoch_loss
-                frame.save_best_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch, train_epoch_loss)
-        if epoch % cfg.SAVE_FREQ == 0:
-            frame.save_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch)
-
+                frame.save_weights(cfg.OUT_PATH, cfg.NET.NAME, cfg.CFG_NOTE, epoch, train_epoch_loss)
         epoch_timer.stop()
         logger.log_in(f'epoch: {epoch}, epoch_time: {epoch_timer.get_epochtime()}, '
                       f'train_loss: {train_epoch_loss:.3f}, best_loss: {best_loss:.3f}, '
-                      f'lr: {frame.learning_rate:.2e}, wd:{frame.weight_decay:.3f}, '
-                      f'teacher_temp:{frame.teacher_temperature:.3f}, teacher_mom:{frame.teacher_momentum:.3f}')
+                      f'lr: {frame.lr:.2e}, ')   # FIXME schedulers...wd...momentum...
+            
+        frame.update_lr()
         logger.flush()
 
     total_timer.stop()
     logger.log_in(f'train_time: {epoch_timer.get_sumtime()}, '
                   f'{train_dataset.__len__() * (cfg.TRAIN.NUM_EPOCHS - cfg.TRAIN.START_EPOCH) / epoch_timer.sum():.2f}examples/sec, '
                   f'total_time: {total_timer.get_sumtime()}, best_loss: {best_loss:.3f}', 'Finish!')
-    logger.save_log(cfg.OUT_PATH)
+    logger.save_log(f'{cfg.OUT_PATH}/config')
 
 def get_parserargs():
     parser = argparse.ArgumentParser(description='Train the network on images using Pytorch')
