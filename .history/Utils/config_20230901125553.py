@@ -534,14 +534,6 @@ def update_config(config, args):
     # set local rank for distributed training
     config.LOCAL_RANK = args.local_rank
 
-    if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
-        config.GLOBAL_RANK = int(os.environ["RANK"])
-        config.WORLD_SIZE = int(os.environ['WORLD_SIZE'])
-        print(f"RANK and WORLD_SIZE in environ: {config.GLOBAL_RANK}/{config.WORLD_SIZE}")
-    else:
-        config.GLOBAL_RANK = -1
-        config.WORLD_SIZE = -1
-
     # output folder
     if config.OUTPUT_PATH is None:
         config.OUTPUT_PATH = os.path.join(config.DATA.TRAIN_DATA_PATH, f'/{config.NET.NAME}_output')

@@ -537,7 +537,7 @@ def update_config(config, args):
     if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
         config.GLOBAL_RANK = int(os.environ["RANK"])
         config.WORLD_SIZE = int(os.environ['WORLD_SIZE'])
-        print(f"RANK and WORLD_SIZE in environ: {config.GLOBAL_RANK}/{config.WORLD_SIZE}")
+        print(f"RANK and WORLD_SIZE in environ: {cfg.GLOBAL_RANK}/{cfg.WORLD_SIZE}")
     else:
         config.GLOBAL_RANK = -1
         config.WORLD_SIZE = -1
