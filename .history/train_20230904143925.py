@@ -78,6 +78,7 @@ def get_parserargs():
 
     # ==========training misc setting==========
     # config setting
+    parser.add_argument('--is_cmd', '-cmd', default=False, help='If training on cmd, set on_cmd True')
     parser.add_argument('--cfg_path', '-cfg', type=str, default=None, metavar="CFG", help='path to load a local config file')
     parser.add_argument('--cfg_note', '-cn', metavar='CN', type=str, help='note which will be saved in config name')
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')

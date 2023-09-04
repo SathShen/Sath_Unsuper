@@ -78,6 +78,7 @@ def get_parserargs():
 
     # ==========training misc setting==========
     # config setting
+    parser.add_argument('--is_cmd', '-cmd', default=False, help='If training on cmd, set on_cmd True')
     parser.add_argument('--cfg_path', '-cfg', type=str, default=None, metavar="CFG", help='path to load a local config file')
     parser.add_argument('--cfg_note', '-cn', metavar='CN', type=str, help='note which will be saved in config name')
     parser.add_argument('--pretrain_path', '-pp', metavar='PP', type=str, default=None, help='pretrain model abspath')
@@ -196,6 +197,88 @@ def get_parserargs():
     config = get_config(args)
     save_config(config)
     return config
+
+
+def init_args(args):
+    args.cfg_path = 'None'
+    args.cfg_note = 'stltest'
+    args.pretrain_path = 'None'
+    args.output_path = r'E:/Outputs'
+
+    args.is_fp16 = True
+    args.save_freq = 20
+    args.num_epochs = 100
+    args.clip_grad = 3.0
+    args.freeze_last_layer_epochs = 1
+
+    args.train_data_path = r'F:/Backup/Not_RS/classification/stl10/labeled'
+    args.num_workers = 4
+    args.batch_size_per_gpu = 2
+    
+    args.is_aug = True
+    args.aug_size = 448
+    args.aug_scale = 0.4
+    args.aug_ratio = 0.3
+    args.aug_intensity = 0.4
+    args.aug_hue = 0.2
+    args.aug_saturation = 0.4
+    args.aug_contrast = 0.4
+    args.aug_global_scale = (0.4, 1.)
+    args.aug_num_local = 8
+    args.aug_local_scale = (0.05, 0.4)
+    args.aug_local_crop_size = 192
+    
+    args.net_name = 'dinov1'
+    args.net_dropout_rate = 0.0
+    args.net_dropout_path_rate = 0.2
+    args.net_patch_size = 16
+    args.net_embed_dim = 192
+    args.net_out_dim = 65536
+    args.net_num_heads = 3
+
+    args.net_dino_is_norm_last_layer = True
+    args.net_dino_is_bn_in_head = False
+
+    args.loss_name = 'dinov1'
+
+    args.optim_name = 'adamw'
+
+    args.learning_rate = 2e-3
+    args.lrs_final_value = 1e-6
+    args.lrs_warmup_epochs = 10
+    args.lrs_warmup_value = 0
+    args.lrs_freeze_epochs = 0
+    args.lrs_is_restart = False
+    args.lrs_T_0 = 10
+    args.lrs_T_mult = 1
+
+    args.weight_decay = 0.04
+    args.wds_final_value = 0.4
+    args.wds_warmup_epochs = 0
+    args.wds_warmup_value = 0
+    args.wds_freeze_epochs = 0
+    args.wds_is_restart = False
+    args.wds_T_0 = 0
+    args.wds_T_mult = 0
+
+    args.teacher_momentum = 0.996
+    args.tms_final_value = 1.
+    args.tms_warmup_epochs = 0
+    args.tms_warmup_value = 0
+    args.tms_freeze_epochs = 0
+    args.tms_is_restart = False
+    args.tms_T_0 = 0
+    args.tms_T_mult = 0
+
+    args.student_temp = 0.1
+    args.teacher_temp = 0.04
+    args.tts_final_value = 0.04
+    args.tts_warmup_epochs = 30
+    args.tts_warmup_value = 0
+    args.tts_freeze_epochs = 0
+    args.tts_is_restart = False
+    args.tts_T_0 = 0
+    args.tts_T_mult = 0
 
 
 # rewrite to ddp
