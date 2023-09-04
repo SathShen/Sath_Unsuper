@@ -30,6 +30,9 @@ class PretrainFrame():
         self.net = build_net(cfg)
 
         self.n_parameters = sum(p.numel() for p in self.net.parameters() if p.requires_grad)
+        if hasattr(self.net, 'flops'):
+            self.flops = self.net.flops()
+
 
         self.net = self.net.cuda()
         self.net = DistributedDataParallel(self.net, device_ids=[cfg.LOCAL_RANK])
@@ -88,28 +91,30 @@ class PretrainFrame():
         self.teacher_temperature = self.teacher_temp_scheduler[self.it]
         self.optimizer.zero_grad()
         with autocast():
-            student_output, teacher_output = self.net(crop_list_gpu)
+            student_output, teacher_output = self.net(crop_list_gpu)   # pred: batch_size, num_classes, H, W
             loss = self.loss_fuc(student_output, teacher_output, self.teacher_temperature)
         if self.fp16_scaler is not None:
             self.fp16_scaler.scale(loss).backward()
         else:
             loss.backward()
 
+
+
         # clip gradient and update parameters
         if self.fp16_scaler is not None:
             if self.clip_grad:
                 self.fp16_scaler.unscale_(self.optimizer)  # unscale the gradients of optimizer's assigned params in-place
                 # Calculate the gradient norm for all parameters in self.net.student
-                nn.utils.clip_grad_norm_(self.net.module.student.backbone.parameters(), self.clip_grad)
-                nn.utils.clip_grad_norm_(self.net.module.student.head.parameters(), self.clip_grad)
+                nn.utils.clip_grad_norm_(self.net.student.backbone.parameters(), self.clip_grad)
+                nn.utils.clip_grad_norm_(self.net.student.head.parameters(), self.clip_grad)
 
             self.fp16_scaler.step(self.optimizer)
             self.fp16_scaler.update()
         else:
             if self.clip_grad:
                 # Calculate the gradient norm for all parameters in self.net.student
-                nn.utils.clip_grad_norm_(self.net.module.student.backbone.parameters(), self.clip_grad)
-                nn.utils.clip_grad_norm_(self.net.module.student.head.parameters(), self.clip_grad)
+                nn.utils.clip_grad_norm_(self.net.student.backbone.parameters(), self.clip_grad)
+                nn.utils.clip_grad_norm_(self.net.student.head.parameters(), self.clip_grad)
             self.optimizer.step()
 
         # check if loss is valid
