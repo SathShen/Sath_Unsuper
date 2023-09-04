@@ -149,6 +149,7 @@ class PretrainFrame():
             if is_Tbackbone_only:
                 torch.save({'model_state_dict': self.net.teacher.module.state_dict()}, path)
             else:
+                
                 torch.save({'model_state_dict': self.net.module.state_dict(),
                             'optimizer_state_dict': self.optimizer.state_dict()}, path)
             

@@ -29,7 +29,8 @@ class ModelWrapper(nn.Module):
         self.backbone = backbone
         self.head = head
 
-    def forward(self, crops_list):
+
+    def forward(self, x):
         if not isinstance(crops_list, list):
             crops_list = [crops_list]
         idx_crops = torch.cumsum(              # 计算出所有crop的宽度以及其计数累加和 224 224 96 96 96 96 idx_crops = tensor([2, 6])
@@ -83,9 +84,11 @@ class DinoV1(nn.Module):
         for p in self.teacher.parameters():
             p.requires_grad = False
 
+
+
     def forward(self, crops_list):
-        student_output = self.student(crops_list)
-        teacher_output = self.teacher(crops_list)
+        student_output = self.forward_one(crops_list, self.student_backbone, self.student_head)
+        teacher_output = self.forward_one(crops_list[:2], self.teacher_backbone, self.teacher_head)
         return student_output, teacher_output
     
     def get_params_groups(self):

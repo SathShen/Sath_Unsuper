@@ -26,20 +26,23 @@ def has_batchnorms(model):
 class ModelWrapper(nn.Module):
     def __init__(self, backbone, head):
         super(ModelWrapper, self).__init__()
-        self.backbone = backbone
-        self.head = head
+        self.model = nn.Sequential(backbone, head)
 
-    def forward(self, crops_list):
+
+        def forward_one(self, crops_list, backbone, head):
         if not isinstance(crops_list, list):
             crops_list = [crops_list]
         idx_crops = torch.cumsum(              # 计算出所有crop的宽度以及其计数累加和 224 224 96 96 96 96 idx_crops = tensor([2, 6])
             torch.unique_consecutive(torch.tensor([inp.shape[-1] for inp in crops_list]),return_counts=True)[1], 0) 
         start_idx, output = 0, torch.empty(0).to(crops_list[0].device)
         for end_idx in idx_crops:
-            _out = self.backbone(torch.cat(crops_list[start_idx: end_idx]))  # cat一样宽度的输入网络  out shape:(batch_size * 同宽crop数, embeddim * 4)
+            _out = backbone(torch.cat(crops_list[start_idx: end_idx]))  # cat一样宽度的输入网络  out shape:(batch_size * 同宽crop数, embeddim * 4)
             output = torch.cat((output, _out))  # 将所有输出拼接，再传入head
             start_idx = end_idx
-        return self.head(output)
+        return head(output)
+
+    def forward(self, x):
+        return self.model(x)
 
 
 
@@ -83,9 +86,11 @@ class DinoV1(nn.Module):
         for p in self.teacher.parameters():
             p.requires_grad = False
 
+
+
     def forward(self, crops_list):
-        student_output = self.student(crops_list)
-        teacher_output = self.teacher(crops_list)
+        student_output = self.forward_one(crops_list, self.student_backbone, self.student_head)
+        teacher_output = self.forward_one(crops_list[:2], self.teacher_backbone, self.teacher_head)
         return student_output, teacher_output
     
     def get_params_groups(self):

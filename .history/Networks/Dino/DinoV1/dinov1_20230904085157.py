@@ -29,6 +29,7 @@ class ModelWrapper(nn.Module):
         self.backbone = backbone
         self.head = head
 
+
     def forward(self, crops_list):
         if not isinstance(crops_list, list):
             crops_list = [crops_list]
@@ -83,9 +84,11 @@ class DinoV1(nn.Module):
         for p in self.teacher.parameters():
             p.requires_grad = False
 
+
+
     def forward(self, crops_list):
-        student_output = self.student(crops_list)
-        teacher_output = self.teacher(crops_list)
+        student_output = self.forward_one(crops_list, self.student_backbone, self.student_head)
+        teacher_output = self.forward_one(crops_list[:2], self.teacher_backbone, self.teacher_head)
         return student_output, teacher_output
     
     def get_params_groups(self):

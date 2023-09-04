@@ -145,10 +145,10 @@ class PretrainFrame():
                         torch.save({'model_state_dict': self.net.module.state_dict(),
                                     'optimizer_state_dict': self.optimizer.state_dict()}, path)
         else:
-            path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
             if is_Tbackbone_only:
-                torch.save({'model_state_dict': self.net.teacher.module.state_dict()}, path)
+                        torch.save({'model_state_dict': self.net.teacher.module.state_dict()}, path)
             else:
+                path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
                 torch.save({'model_state_dict': self.net.module.state_dict(),
                             'optimizer_state_dict': self.optimizer.state_dict()}, path)
             

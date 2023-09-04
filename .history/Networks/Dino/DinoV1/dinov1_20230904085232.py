@@ -86,6 +86,7 @@ class DinoV1(nn.Module):
     def forward(self, crops_list):
         student_output = self.student(crops_list)
         teacher_output = self.teacher(crops_list)
+
         return student_output, teacher_output
     
     def get_params_groups(self):

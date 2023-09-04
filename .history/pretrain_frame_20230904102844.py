@@ -126,7 +126,7 @@ class PretrainFrame():
         self.it += 1
         return loss.item()
 
-    def save_best_weights(self, output_path, net_name, cfg_note, epoch, best_loss, is_Tbackbone_only=True):
+    def save_best_weights(self, output_path, net_name, cfg_note, epoch, best_loss, is_Tbackbone_only=False):
         """save checkpoint with best loss NOT mIoU"""
         file_list = [w for w in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, w))]
         weight_list = list(filter(lambda x: (len(x.split('_')) == 4) , file_list))
@@ -139,18 +139,12 @@ class PretrainFrame():
                 if namesplits[3][:3] <= best_loss_str:
                     os.remove(f'{output_path}/{weight_names}')
                     path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
-                    if is_Tbackbone_only:
-                        torch.save({'model_state_dict': self.net.teacher.module.state_dict()}, path)
-                    else:
-                        torch.save({'model_state_dict': self.net.module.state_dict(),
-                                    'optimizer_state_dict': self.optimizer.state_dict()}, path)
+                    torch.save({'model_state_dict': self.net.module.state_dict(),
+                                'optimizer_state_dict': self.optimizer.state_dict()}, path)
         else:
             path = f"{output_path}/{net_name}_{cfg_note}_ep{epoch}_{best_loss_str}.params"
-            if is_Tbackbone_only:
-                torch.save({'model_state_dict': self.net.teacher.module.state_dict()}, path)
-            else:
-                torch.save({'model_state_dict': self.net.module.state_dict(),
-                            'optimizer_state_dict': self.optimizer.state_dict()}, path)
+            torch.save({'model_state_dict': self.net.module.state_dict(),
+                        'optimizer_state_dict': self.optimizer.state_dict()}, path)
             
     def save_weights(self, output_path, net_name, cfg_note, epoch):
         output_path = output_path + '/autosave'
